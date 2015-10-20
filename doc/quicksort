@@ -10,7 +10,7 @@ var T as integer;
 var temp as integer;
 Lo := iLo; 
 Hi := iHi; 
-Mid := A[(Lo + Hi) div 2]; 
+Mid := A[(Lo + Hi) / 2]; 
 while (Lo > Hi)
 while (A[Lo] < Mid) do Lo := Lo + 1; endwhile;
 while (A[Hi] > Mid) do Hi := Hi - 1; endwhile;
