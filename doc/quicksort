@@ -6,7 +6,6 @@ procedure _QuickSort(A, iLo, iHi)
 var Lo as integer;
 var Hi as integer;
 var Mid as integer;
-var T as integer;
 var temp as integer;
 Lo := iLo; 
 Hi := iHi; 
@@ -18,9 +17,6 @@ if (Lo <= Hi) then
 temp := A[Lo];
 A[Lo] := A[Hi];
 A[Hi] := temp;
-T := A[Lo]; 
-A[Lo] := A[Hi]; 
-A[Hi] := T; 
 Lo := Lo + 1; 
 Hi := Hi - 1; 
 endif;
