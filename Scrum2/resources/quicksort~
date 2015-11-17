@@ -1,0 +1,30 @@
+program qs_test
+
+procedure _QuickSort(A, iLo, iHi) 
+var Lo as integer;
+var Hi as integer;
+var Mid as integer;
+var temp as integer;
+Lo := iLo; 
+Hi := iHi; 
+Mid := A[(Lo + Hi) / 2]; 
+while (Lo > Hi)
+while (A[Lo] < Mid) do Lo := Lo + 1; endwhile;
+while (A[Hi] > Mid) do Hi := Hi - 1; endwhile;
+if (Lo <= Hi) then  
+temp := A[Lo];
+A[Lo] := A[Hi];
+A[Hi] := temp;
+Lo := Lo + 1; 
+Hi := Hi - 1; 
+endif;
+endwhile; 
+if (Hi > iLo) then _QuickSort(A, iLo, Hi); endif;
+if (Lo < iHi) then _QuickSort(A, Lo, iHi); endif;
+endfunction; 
+
+procedure QuickSort(A, size) 
+_QuickSort(A, 0, size-1); 
+endfunction; 
+
+

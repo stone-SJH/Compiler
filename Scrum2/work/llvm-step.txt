@@ -1,0 +1,13 @@
+#for use
+#...
+#获得qs.ll
+llc qs.ll
+#获得qs.s
+clang qs.ll -o qs
+#获得qs
+./qs
+#执行qs
+#################
+#for test
+clang -emit-llvm 1.c -S -o 1.ll
+#生成中间代码文件

@@ -1,0 +1,236 @@
+;ModuleID = 'qsort' 
+
+@_printa = internal constant [5 x i8] c"%d  \00", align 1
+declare i32 @printf(i8*, ...)
+define void @printa(i32* %arr, i32 %n) nounwind {
+entry:
+  %arr.addr = alloca i32*, align 4
+  store i32* %arr, i32** %arr.addr, align 4
+  %n.addr = alloca i32, align 4
+  store i32 %n, i32* %n.addr, align 4
+  %i = alloca i32, align 4
+  store i32 0, i32* %i, align 4
+  br label %0
+
+  %1 = load i32* %i, align 4
+  %2 = load i32* %n.addr, align 4
+  %3 = icmp slt i32 %1, %2
+  br i1 %3, label %4, label %12
+
+; <label> : %4
+  %5 = load i32* %i, align 4
+  %6 = load i32** %arr.addr, align 4
+  %7 = getelementptr inbounds i32* %6, i32 %5
+  %8 = load i32* %7, align 4
+  call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @_printa, i32 0, i32 0), i32 %8)
+  %10 = load i32* %i, align 4
+  %11 = add nsw i32 %10, 1
+  store i32 %11, i32* %i, align 4
+  br label %0
+
+; <label> : %12
+  ret void
+}
+
+define void @_quicksort(i32* %a, i32 %iLo, i32 %iHi) {
+  %1 = alloca i32*, align 8
+  %2 = alloca i32, align 4
+  %3 = alloca i32, align 4 
+  %Lo = alloca i32, align 4
+  %Hi = alloca i32, align 4
+  %Mid = alloca i32, align 4
+  %temp = alloca i32, align 4
+  store i32* %a, i32** %1
+  store i32 %iLo, i32* %2
+  store i32 %iHi, i32* %3
+  %4 = load i32* %2
+  store i32 %4, i32* %Lo
+  %5 = load i32* %3
+  store i32 %5, i32* %Hi
+  %6 = load i32* %Lo
+  %7 = load i32* %Hi
+  %8 = add nsw i32 %6, %7
+  %9 = sdiv i32 %8, 2
+  %10 = load i32** %1
+  %11 = sext i32 %9 to i64
+  %12 = getelementptr inbounds i32* %10, i64 %11
+  %13 = load i32* %12
+  store i32 %13, i32* %Mid
+  br label %14
+
+; <label>:14
+  %15 = load i32* %Lo
+  %16 = load i32* %Hi
+  %17 = icmp slt i32 %15, %16
+  br i1 %17, label %18, label %71
+
+; <label>:18
+  br label %19
+
+; <label>:19
+  %20 = load i32* %Lo
+  %21 = load i32** %1
+  %22 = sext i32 %20 to i64
+  %23 = getelementptr inbounds i32* %21, i64 %22
+  %24 = load i32* %23
+  %25 = load i32* %Mid
+  %26 = icmp slt i32 %24, %25
+  br i1 %26, label %27, label %30
+
+; <label>:27
+  %28 = load i32* %Lo
+  %29 = add nsw i32 %28, 1
+  store i32 %29, i32* %Lo
+  br label %19
+
+; <label>:30
+  br label %31
+
+; <label>:31
+  %32 = load i32* %Hi
+  %33 = load i32** %1
+  %34 = sext i32 %32 to i64
+  %35 = getelementptr inbounds i32* %33, i64 %34
+  %36 = load i32* %35
+  %37 = load i32* %Mid
+  %38 = icmp sgt i32 %36, %37
+  br i1 %38, label %39, label %42
+
+; <label>:39
+  %40 = load i32* %Hi
+  %41 = add nsw i32 %40, -1
+  store i32 %41, i32* %Hi
+  br label %31
+
+; <label>:42
+  %43 = load i32* %Lo
+  %44 = load i32* %Hi
+  %45 = icmp sle i32 %43, %44
+  br i1 %45, label %46, label %70
+
+; <label>:46
+  %47 = load i32* %Lo
+  %48 = load i32** %1
+  %49 = sext i32 %47 to i64
+  %50 = getelementptr inbounds i32* %48, i64 %49
+  %51 = load i32* %50
+  store i32 %51, i32* %temp
+  %52 = load i32* %Hi
+  %53 = load i32** %1
+  %54 = sext i32 %52 to i64
+  %55 = getelementptr inbounds i32* %53, i64 %54
+  %56 = load i32* %55
+  %57 = load i32* %Lo
+  %58 = load i32** %1
+  %59 = sext i32 %57 to i64
+  %60 = getelementptr inbounds i32* %58, i64 %59
+  store i32 %56, i32* %60
+  %61 = load i32* %temp
+  %62 = load i32* %Hi
+  %63 = load i32** %1
+  %64 = sext i32 %62 to i64
+  %65 = getelementptr inbounds i32* %63, i64 %64
+  store i32 %61, i32* %65
+  %66 = load i32* %Lo
+  %67 = add nsw i32 %66, 1
+  store i32 %67, i32* %Lo
+  %68 = load i32* %Hi
+  %69 = add nsw i32 %68, -1
+  store i32 %69, i32* %Hi
+  br label %70
+
+; <label>:70
+  br label %14
+
+; <label>:71
+  %72 = load i32* %Hi
+  %73 = load i32* %2
+  %74 = icmp sgt i32 %72, %73
+  br i1 %74, label %75, label %79
+
+; <label>:75
+  %76 = load i32** %1
+  %77 = load i32* %2
+  %78 = load i32* %Hi
+  call void @_quicksort(i32* %76, i32 %77, i32 %78)
+  br label %79
+
+; <label>:79
+  %80 = load i32* %Lo
+  %81 = load i32* %3
+  %82 = icmp slt i32 %80, %81
+  br i1 %82, label %83, label %87
+
+; <label>:83
+  %84 = load i32** %1
+  %85 = load i32* %Lo
+  %86 = load i32* %3
+  call void @_quicksort(i32* %84, i32 %85, i32 %86)
+  br label %87
+
+; <label>:87
+  ret void
+}
+
+define void @quicksort(i32* %a, i32 %length) {
+  %1 = alloca i32*, align 8
+  %2 = alloca i32, align 4
+  store i32* %a, i32** %1
+  store i32 %length, i32* %2
+  %3 = load i32** %1
+  %4 = load i32* %2
+  %5 = sub i32 %4, 1
+  call void @_quicksort(i32* %3, i32 0, i32 %5)
+  ret void
+}
+
+define i32 @main() {
+  %1 = alloca i32, align 4
+  %a = alloca [10 x i32], align 4
+  %n = alloca i32, align 4
+  store i32 0, i32* %1
+  store i32 10, i32* %n
+  %2 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %3 = getelementptr inbounds i32* %2, i64 0
+  store i32 1, i32* %3
+  %4 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %5 = getelementptr inbounds i32* %4, i64 1
+  store i32 2, i32* %5
+  %6 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %7 = getelementptr inbounds i32* %6, i64 2
+  store i32 0, i32* %7
+  %8 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %9 = getelementptr inbounds i32* %8, i64 3
+  store i32 10, i32* %9
+  %10 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %11 = getelementptr inbounds i32* %10, i64 4
+  store i32 22, i32* %11
+  %12 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %13 = getelementptr inbounds i32* %12, i64 5
+  store i32 1, i32* %13
+  %14 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %15 = getelementptr inbounds i32* %14, i64 6
+  store i32 3, i32* %15
+  %16 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %17 = getelementptr inbounds i32* %16, i64 7
+  store i32 12, i32* %17
+  %18 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %19 = getelementptr inbounds i32* %18, i64 8
+  store i32 4, i32* %19
+  %20 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %21 = getelementptr inbounds i32* %20, i64 9
+  store i32 3, i32* %21
+ 
+  %22 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %23 = load i32* %n
+  call void @quicksort(i32* %22, i32 %23)
+
+  %24 = getelementptr inbounds [10 x i32]* %a, i32 0, i32 0
+  %25 = load i32* %n
+  call void @printa(i32* %24, i32 %25)
+  
+
+  store i32 0, i32* %1
+  %26 = load i32* %1
+  ret i32 %26
+}
