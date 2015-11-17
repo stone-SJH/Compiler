@@ -1,8 +1,0 @@
-#...
-#获得qs.ll
-llc qs.ll
-#获得qs.s
-clang qs.ll -o qs
-#获得qs
-./qs
-#执行qs
