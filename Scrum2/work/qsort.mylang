@@ -1,0 +1,28 @@
+let  _QuickSort(A, iLo, iHi) 
+var Lo as int;
+var Hi as int;
+var Mid as int;
+var temp as int;
+Lo = iLo; 
+Hi = iHi; 
+Mid = A[(Lo + Hi) / 2]; 
+while (Lo < Hi)
+while (A[Lo] < Mid) Lo = Lo + 1; endwhile
+while (A[Hi] > Mid)  Hi = Hi - 1; endwhile
+if (Lo <= Hi) then  
+temp = A[Lo];
+A[Lo] = A[Hi];
+A[Hi] = temp;
+Lo = Lo + 1; 
+Hi = Hi - 1; 
+endif
+endwhile 
+if (Hi > iLo) then _QuickSort(A, iLo, Hi); endif
+if (Lo < iHi) then _QuickSort(A, Lo, iHi); endif
+endfunc
+
+let QuickSort(A, size) 
+_QuickSort(A, 0, size-1); 
+endfunc
+
+
