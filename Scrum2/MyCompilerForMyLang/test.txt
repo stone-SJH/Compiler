@@ -1,0 +1,3 @@
+var tt as int;
+tt=2;
+print(tt);

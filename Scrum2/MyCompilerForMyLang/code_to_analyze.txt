@@ -1,0 +1,1 @@
+var i as int;i=5;print(i);
