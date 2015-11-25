@@ -36,14 +36,14 @@ entry:
 define void @_quicksort(i32* %a, i32 %iLo, i32 %iHi) {
   %1 = alloca i32*, align 8
   %2 = alloca i32, align 4
-  %3 = alloca i32, align 4 
+  %3 = alloca i32, align 4
+  store i32* %a, i32** %1
+  store i32 %iLo, i32* %2
+  store i32 %iHi, i32* %3
   %Lo = alloca i32, align 4
   %Hi = alloca i32, align 4
   %Mid = alloca i32, align 4
   %temp = alloca i32, align 4
-  store i32* %a, i32** %1
-  store i32 %iLo, i32* %2
-  store i32 %iHi, i32* %3
   %4 = load i32* %2
   store i32 %4, i32* %Lo				;Lo := iLo; 
   %5 = load i32* %3
