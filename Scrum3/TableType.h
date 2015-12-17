@@ -4,36 +4,35 @@ using namespace std;
 
 enum stype{//symbol type
 	FUNCTION,
-	TYPE,
+	ATYPE,
 	VARIABLE
 };
-enum type{
-	INT,
-	BOOLEAN,
-	CHAR
-};
+
 //overall
 class SymbolTable{
+public:
 	vector<string> symbolName;
 	vector<stype> symbolType;
 };
-//for class
+//for class & array
 class TypeTable{
+public:
 	vector<string> typeName;
 	vector<int> typeNum;
 	vector<string> typeInfo;
 };
 class VariableTable{
+public:
 	vector<string> variableName;
 	vector<string> variableType;
-	vector<string> variableValue;
 };
 class FunctionTable{
+public:
 	vector<string> functionName;
-	vector<string> functionReturn;
+	//vector<string> functionReturn;
 	vector<int> functionParaNum;
 	vector<vector<string>> functionParaType;
 	vector<vector<string>> functionParaName;
-	vector<VariableTable> functionVariable;
+	vector<VariableTable*> functionVariable;
 	vector<bool> functionState;
 };
