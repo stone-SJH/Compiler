@@ -11,24 +11,31 @@ private:
 	VariableTable* vt;
 	FunctionTable* ft;
 	
-	bool checkSymbol(string name);
-	bool checkType(string name);
-	bool checkVariable(string name);
-	bool checkFunction(string name);
-	int findType(string name);
-	int findVariable(string name);
 
-	void FuncAnalyseVariable(ast*node, VariableTable* fvt);
-	void FuncReadVariable(ast* node, VariableTable* fvt);
+
+	void AnalyseType(ast* node);
+	void AnalyseFunction(ast* node);
+	void AnalyseMain(ast* node);
+	void AnalyseVariable(ast* node);
+
+	void FuncAnalyseVariable(ast* node, VariableTable* fvt);
+	void FuncAnalyseType(ast* node, TypeTable* ftt);
+	void FuncRead(ast* node, VariableTable* fvt, TypeTable* ftt);
 	void _Analyse(ast* node);
 	
 	void PrintSymbolTable();
 	
 public:
-	void AnalyseType(ast* node);
-	void AnalyseFunction(ast* node);
-	void AnalyseMain(ast* node);
-	void AnalyseVariable(ast* node);
+	para* checkFuncPara(string name, int index);
+	para* checkFuncVar(string name, int index);
+	para* checkFuncType(string name, int index);
+	para* checkVariable(string name);
+	para* checkType(string name);
+
+	bool checkSymbol(string name);
+	
+	int findType(string name);
+	int findVariable(string name);
 
 	SymbolTableAnalyse();
 	void Analyse(ast* root);

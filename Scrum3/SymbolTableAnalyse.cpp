@@ -1,13 +1,14 @@
 #include"SymbolTableAnalyse.h"
 
-void SymbolTableAnalyse::AnalyseVariable(ast* node){
+void 
+SymbolTableAnalyse::AnalyseVariable(ast* node){
 	struct var* v = (struct var*) node;
 	string _type, _name;
-	if (v->datatype == 0)
-		_type = "integer";
 	if (v->datatype == 1)
-		_type = "double";
+		_type = "integer";
 	if (v->datatype == 2)
+		_type = "double";
+	if (v->datatype == 0)
 		_type = "char";
 	//[TODO]class type check 
 	_name = v->name;
@@ -17,15 +18,16 @@ void SymbolTableAnalyse::AnalyseVariable(ast* node){
 	st->symbolType.push_back(VARIABLE);
 	return;
 }
-void SymbolTableAnalyse::AnalyseType(ast* node){
+void 
+SymbolTableAnalyse::AnalyseType(ast* node){
 	struct arr* a = (struct arr*) node;
 	string _name, _info;
 	int _num;
-	if (a->datatype == 0)
-		_info = "integer";
 	if (a->datatype == 1)
-		_info = "double";
+		_info = "integer";
 	if (a->datatype == 2)
+		_info = "double";
+	if (a->datatype == 0)
 		_info = "char";
 	_name = a->name;
 	_num = a->size;
@@ -37,14 +39,15 @@ void SymbolTableAnalyse::AnalyseType(ast* node){
 	return;
 }
 
-void SymbolTableAnalyse::FuncAnalyseVariable(ast*node, VariableTable* fvt){
+void 
+SymbolTableAnalyse::FuncAnalyseVariable(ast*node, VariableTable* fvt){
 	struct var* v = (struct var*) node;
 	string _type, _name;
-	if (v->datatype == 0)
-		_type = "integer";
 	if (v->datatype == 1)
-		_type = "double";
+		_type = "integer";
 	if (v->datatype == 2)
+		_type = "double";
+	if (v->datatype == 0)
 		_type = "char";
 	//[TODO]class type check 
 	_name = v->name;
@@ -53,25 +56,51 @@ void SymbolTableAnalyse::FuncAnalyseVariable(ast*node, VariableTable* fvt){
 	return;
 }
 
-void SymbolTableAnalyse::FuncReadVariable(ast* node, VariableTable* fvt){
+void SymbolTableAnalyse::FuncAnalyseType(ast* node, TypeTable* ftt){
+	struct arr* a = (struct arr*) node;
+	string _name, _info;
+	int _num;
+	if (a->datatype == 1)
+		_info = "integer";
+	if (a->datatype == 2)
+		_info = "double";
+	if (a->datatype == 0)
+		_info = "char";
+	_name = a->name;
+	_num = a->size;
+	ftt->typeName.push_back(_name);
+	ftt->typeNum.push_back(_num);
+	ftt->typeInfo.push_back(_info);
+	return;
+}
+
+void 
+SymbolTableAnalyse::FuncRead(ast* node, VariableTable* fvt, TypeTable* ftt){
 	if (node->nodetype == 5){
 		FuncAnalyseVariable(node, fvt);
 		return;
 	}
+	if (node->nodetype == 6){
+		FuncAnalyseType(node, ftt);
+		return;
+	}
 	if (node->nodetype == 'L'){
-		FuncReadVariable(node->l, fvt);
-		FuncReadVariable(node->r, fvt);
+		FuncRead(node->l, fvt, ftt);
+		FuncRead(node->r, fvt, ftt);
 	}
 }
 
-void SymbolTableAnalyse::AnalyseFunction(ast* node){
+void 
+SymbolTableAnalyse::AnalyseFunction(ast* node){
 	struct fndec* f = (struct fndec*) node;
 	string _name;
 	//string _return;
 	int _para_num;
 	vector<string> _para_name;
+	vector<int> _para_size;
 	vector<string> _para_type;
 	VariableTable* fvt = new VariableTable();
+	TypeTable* ftt = new TypeTable();
 	bool _funcstate;
 
 	_name = f->name;
@@ -83,25 +112,29 @@ void SymbolTableAnalyse::AnalyseFunction(ast* node){
 	symlist* it = f->s;
 	while (it != NULL){
 		_para_name.push_back(it->cur->name);
-		if (it->cur->datatype == 0)
-			_para_type.push_back("integer");
+		_para_size.push_back(it->cur->size);
 		if (it->cur->datatype == 1)
-			_para_type.push_back("double");
+			_para_type.push_back("integer");
 		if (it->cur->datatype == 2)
+			_para_type.push_back("double");
+		if (it->cur->datatype == 0)
 			_para_type.push_back("char");
 		_para_num++;
 		it = it->next;
 	}
 	ft->functionParaNum.push_back(_para_num);
 	ft->functionParaName.push_back(_para_name);
+	ft->functionParaSize.push_back(_para_size);
 	ft->functionParaType.push_back(_para_type);
 
 	ast*  cur = f->tl;
-	FuncReadVariable(cur, fvt);
+	FuncRead(cur, fvt, ftt);
 	ft->functionVariable.push_back(fvt);
+	ft->functionType.push_back(ftt);
 }
 
-void SymbolTableAnalyse::_Analyse(ast* node){
+void 
+SymbolTableAnalyse::_Analyse(ast* node){
 	if (node == NULL)
 		return;
 	switch (node->nodetype)
@@ -133,7 +166,8 @@ void SymbolTableAnalyse::_Analyse(ast* node){
 	}
 }
 
-void SymbolTableAnalyse::Analyse(ast* root){
+void 
+SymbolTableAnalyse::Analyse(ast* root){
 	_Analyse(root);
 }
 
@@ -142,4 +176,80 @@ SymbolTableAnalyse::SymbolTableAnalyse(){
 	tt = new TypeTable();
 	vt = new VariableTable();
 	ft = new FunctionTable();
+}
+
+para*
+SymbolTableAnalyse::checkFuncPara(string name, int index){
+	para* p = new para();
+	int size = ft->functionParaName[index].size();
+	for (int i = 0; i < size; i++){
+		if (name == ft->functionParaName[index][i]){
+			p->name = name;
+			p->size = ft->functionParaSize[index][i];
+			p->type = ft->functionParaType[index][i];
+			break;
+		}
+	}
+	return p;
+}
+
+
+para*
+SymbolTableAnalyse::checkFuncVar(string name, int index){
+	para* p = new para();
+	int size = ft->functionVariable[index]->variableName.size();
+	for (int i = 0; i < size; i++){
+		if (name == ft->functionVariable[index]->variableName[i]){
+			p->name = name;
+			p->size = -1;
+			p->type = ft->functionVariable[index]->variableType[i];
+			break;
+		}
+	}
+	return p;
+}
+
+para*
+SymbolTableAnalyse::checkFuncType(string name, int index){
+	para* p = new para();
+	int size = ft->functionType[index]->typeName.size();
+	for (int i = 0; i < size; i++){
+		if (name == ft->functionType[index]->typeName[i]){
+			p->name = name;
+			p->size = ft->functionType[index]->typeNum[i];
+			p->type = ft->functionType[index]->typeInfo[i];
+			break;
+		}
+	}
+	return p;
+}
+
+para*
+SymbolTableAnalyse::checkVariable(string name){
+	para* p = new para();
+	int size = vt->variableName.size();
+	for (int i = 0; i < size; i++){
+		if (name == vt->variableName[i]){
+			p->name = name;
+			p->size = -1;
+			p->type = vt->variableType[i];
+			break;
+		}
+	}
+	return p;
+}
+
+para*
+SymbolTableAnalyse::checkType(string name){
+	para* p = new para();
+	int size = tt->typeName.size();
+	for (int i = 0; i < size; i++){
+		if (name == tt->typeName[i]){
+			p->name = name;
+			p->size = tt->typeNum[i];
+			p->type = tt->typeInfo[i];
+			break;
+		}
+	}
+	return p;
 }

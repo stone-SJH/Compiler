@@ -22,6 +22,7 @@ struct arg{
 	char* name;  //变量的名字
 	int datatype; //内置数据类型，char，int，double,-1表示不是内置
 	char* tname; //用户定义数据类型，如class的名字，array的名字，NULL表示不是用户定义
+	int size;  //数组的大小，如果不是数组，则为-1
 };
 struct symlist{
 	struct arg* cur;
@@ -33,7 +34,7 @@ struct symlist{
 struct symbol* lookup(struct pcdata*, char*);
 void insert(struct pcdata*, struct symbol* s);
 struct symlist* newsymlist(struct pcdata*, struct arg* sym, struct symlist* next);
-struct arg* newarg(struct pcdata*, char*, int, char*);
+struct arg* newarg(struct pcdata*, char*, int, char*,int);
 //----------------------------------------------------
 enum  bifs
 {

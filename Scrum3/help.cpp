@@ -3,12 +3,11 @@
 #include <stdarg.h>
 #include <string.h>
 #include <math.h>
-#include <iostream>
 
 #include "defination.h"
 #include "parser.h"
 #include "lexer.h"
-using namespace std;
+
 static bool first = true;
 
 struct symbol* lookup(struct pcdata* pp, char* sym)
@@ -48,7 +47,7 @@ struct symlist* newsymlist(struct pcdata* pp, struct arg* sym, struct symlist*  
 	sl->next = next;
 	return sl;
 }
-struct arg* newarg(struct pcdata*pp, char* vname, int datatype, char* tname)
+struct arg* newarg(struct pcdata*pp, char* vname, int datatype, char* tname,int size)
 {
 	struct arg* a = (struct arg*)malloc(sizeof(struct arg));
 	if (!a)
@@ -59,6 +58,7 @@ struct arg* newarg(struct pcdata*pp, char* vname, int datatype, char* tname)
 	a->datatype = datatype;
 	a->name = vname;
 	a->tname = tname;
+	a->size = size;
 	return a;
 }
 void symlistfree(struct pcdata* pp, struct symlist* sl)
@@ -425,7 +425,6 @@ struct un eval(struct pcdata*pp, struct ast* a)
 			s->func = NULL;
 			s->syms = NULL;
 			insert(pp, s);
-			cout << v->name << endl;
 			return r1;
 		}
 		case 6:
@@ -444,35 +443,36 @@ struct un eval(struct pcdata*pp, struct ast* a)
 				(s + i)->syms = NULL;
 			}
 			insert(pp, s);
-			cout << ar->name << endl;
 			return r1;
 		}
 		case 7:
 		{
 			struct fndec *fn = (struct fndec*)a;
-		/*	struct symbol* s = lookup(pp, fn->name);
+			struct symbol* s = lookup(pp, fn->name);
 			if (s != NULL&&s->func != NULL)
 			{
 				yyerror(pp, "%s  defined repeatly", s->name);
 				exit(0);
 			}
-			else
+			else  if (s==NULL)
+			{
 				s = (struct symbol*)malloc(sizeof(symbol));
+				insert(pp, s);
+			}
 			s->name = fn->name;
 			s->datatype = fn->nodetype;
 			s->func = fn->tl;
-			s->syms = fn->s;*/
-			cout << fn->name << endl;
-		/*	struct symlist* sl = fn->s;
+			s->syms = fn->s;
+			struct symlist* sl = fn->s;
 			while (sl != NULL)
 			{
 				struct symbol* k = (struct symbol*)malloc(sizeof(symbol));
-				k->name = sl->name;
-				k->datatype = -1;
+				k->name = sl->cur->name;
+				k->datatype = sl->cur->datatype;
 				k->charval = 0;
 				k->intval = 0;
 				k->doubval = 0;
-				k->size = 0;
+				k->size = sl->cur->size;
 				k->func = NULL;
 				k->syms = NULL;
 				insert(pp, k);
@@ -483,8 +483,6 @@ struct un eval(struct pcdata*pp, struct ast* a)
 			s->charval = 0;
 			s->intval = 0;
 			s->doubval = 0;
-			insert(pp, s);
-			return r1;*/
 			return r1;
 		}
 		case 8:

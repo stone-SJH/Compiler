@@ -1,3 +1,6 @@
+#ifndef TABLETYPE
+#define TABLETYPE
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -8,6 +11,11 @@ enum stype{//symbol type
 	VARIABLE
 };
 
+struct para{
+	string name;
+	string type;
+	int size;// -1 not array
+};
 //overall
 class SymbolTable{
 public:
@@ -18,8 +26,8 @@ public:
 class TypeTable{
 public:
 	vector<string> typeName;
-	vector<int> typeNum;
-	vector<string> typeInfo;
+	vector<int> typeNum;//size
+	vector<string> typeInfo;//
 };
 class VariableTable{
 public:
@@ -32,7 +40,10 @@ public:
 	//vector<string> functionReturn;
 	vector<int> functionParaNum;
 	vector<vector<string>> functionParaType;
+	vector<vector<int>> functionParaSize;
 	vector<vector<string>> functionParaName;
 	vector<VariableTable*> functionVariable;
+	vector<TypeTable*> functionType;
 	vector<bool> functionState;
 };
+#endif
