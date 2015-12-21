@@ -1913,6 +1913,12 @@ yyreduce:
     { (yyval.sl)=newsymlist(pp,(yyvsp[(1) - (3)].ag),(yyvsp[(3) - (3)].sl)); }
     break;
 
+  case 53:
+/* Line 1792 of yacc.c  */
+#line 135 "parser.y"
+    { (yyval.ag)=NULL; }
+    break;
+
   case 54:
 /* Line 1792 of yacc.c  */
 #line 136 "parser.y"
@@ -2071,7 +2077,7 @@ yyreduce:
 
 
 /* Line 1792 of yacc.c  */
-#line 2075 "parser.cpp"
+#line 2081 "parser.cpp"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

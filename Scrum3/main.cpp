@@ -1,5 +1,6 @@
 #include "defination.h"
 #include <iostream>
+#include <fstream>
 using namespace std;
 #include "parser.h"
 #include "lexer.h"
@@ -176,6 +177,8 @@ int main()
 		cout << "done" << endl;*/
 		IRGeneration* irg = new IRGeneration(root);
 		string ir = irg->Generate();
+		ofstream ofs("IRge_qsort.ll");
+		ofs << ir << endl;
 		cout << ir << endl;
 	}
 }

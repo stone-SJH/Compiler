@@ -104,13 +104,21 @@ SymbolTableAnalyse::AnalyseFunction(ast* node){
 	bool _funcstate;
 
 	_name = f->name;
+	/*here need to change*/
+	if (_name == "main"){
+		ft->functionReturn.push_back(1);
+	}
+	else {
+		ft->functionReturn.push_back(0);
+	}
+	/*end*/
 	ft->functionName.push_back(_name);
 	st->symbolName.push_back(_name);
 	st->symbolType.push_back(FUNCTION);
 
 	_para_num = 0;
 	symlist* it = f->s;
-	while (it != NULL){
+	while (it->cur != NULL){
 		_para_name.push_back(it->cur->name);
 		_para_size.push_back(it->cur->size);
 		if (it->cur->datatype == 1)
@@ -121,6 +129,8 @@ SymbolTableAnalyse::AnalyseFunction(ast* node){
 			_para_type.push_back("char");
 		_para_num++;
 		it = it->next;
+		if (it == NULL)
+			break;
 	}
 	ft->functionParaNum.push_back(_para_num);
 	ft->functionParaName.push_back(_para_name);
@@ -252,4 +262,18 @@ SymbolTableAnalyse::checkType(string name){
 		}
 	}
 	return p;
+}
+
+func*
+SymbolTableAnalyse::checkFunc(string name){
+	func* f = new func();
+	int size = ft->functionName.size();
+	for (int i = 0; i < size; i++){
+		if (name == ft->functionName[i]){
+			f->name = name;
+			f->returntype = ft->functionReturn[i];
+			break;
+		}
+	}
+	return f;
 }

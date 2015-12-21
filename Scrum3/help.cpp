@@ -84,6 +84,7 @@ struct ast* newchar(struct pcdata* pp, char c)
 	a->ch = c;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newint(struct pcdata* pp, int num)
@@ -98,6 +99,7 @@ struct ast* newint(struct pcdata* pp, int num)
 	a->num = num;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newdoub(struct pcdata* pp, double d)
@@ -112,6 +114,7 @@ struct ast* newdoub(struct pcdata* pp, double d)
 	a->doub = d;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newvar(struct pcdata* pp, char* name,int type)
@@ -127,6 +130,7 @@ struct ast* newvar(struct pcdata* pp, char* name,int type)
 	v->datatype = type;
 	v->l = NULL;
 	v->r = NULL;
+	v->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)v;
 }
 struct ast* newarr(struct pcdata* pp, char* name, int type, int size)
@@ -144,6 +148,7 @@ struct ast* newarr(struct pcdata* pp, char* name, int type, int size)
 	ar->size = size;
 	ar->l = NULL;
 	ar->r = NULL;
+	ar->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)ar;
 }
 struct ast* dodef(struct pcdata* pp, char* name, struct symlist* syms, struct ast*func)
@@ -160,6 +165,7 @@ struct ast* dodef(struct pcdata* pp, char* name, struct symlist* syms, struct as
 	a->tl= func;
 	a->l = NULL;
 	a->r = NULL; 
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newclass(struct pcdata* pp, char* vname, char* cname)
@@ -175,6 +181,7 @@ struct ast* newclass(struct pcdata* pp, char* vname, char* cname)
 	a->r = NULL;
 	a->vname = vname;
 	a->cname = cname;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newclassdef(struct pcdata* pp, char* cname, char* fname, struct ast* tl)
@@ -191,6 +198,8 @@ struct ast* newclassdef(struct pcdata* pp, char* cname, char* fname, struct ast*
 	a->cname = cname;
 	a->fname = fname;
 	a->tl = tl;
+	a->lineno = yyget_lineno(pp->scaninfo);
+	return (struct ast*)a;
 }
 struct ast* newcsget(struct pcdata*pp, char* cname, char* kname, int func, struct ast* explist,struct ast* index)
 {
@@ -208,6 +217,7 @@ struct ast* newcsget(struct pcdata*pp, char* cname, char* kname, int func, struc
 	a->func = func;
 	a->explist = explist;
 	a->index = index;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newasgn(struct pcdata* pp,char* cname, char* name, struct ast* v,struct ast* index)
@@ -226,6 +236,7 @@ struct ast* newasgn(struct pcdata* pp,char* cname, char* name, struct ast* v,str
 	a->index = index;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newfunc(struct pcdata* pp, int functype, struct ast* l)
@@ -241,6 +252,7 @@ struct ast* newfunc(struct pcdata* pp, int functype, struct ast* l)
 	a->functype = bifs(functype);
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newcall(struct pcdata*pp, char* s, struct ast* l)
@@ -256,6 +268,7 @@ struct ast* newcall(struct pcdata*pp, char* s, struct ast* l)
 	a->name = s;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newref(struct pcdata* pp, char* name,struct ast* index)
@@ -271,6 +284,7 @@ struct ast* newref(struct pcdata* pp, char* name,struct ast* index)
 	a->index = index;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 //--------------------------------------------
@@ -285,6 +299,7 @@ struct ast* newast(struct pcdata* pp, int nodetype, struct ast*l, struct ast* r)
 	a->nodetype = nodetype;
 	a->l = l;
 	a->r = r;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return a;
 }
 struct ast* newflow(struct pcdata* pp, int nodetype, struct ast* cond, struct ast* tl, struct ast* el)
@@ -301,6 +316,7 @@ struct ast* newflow(struct pcdata* pp, int nodetype, struct ast* cond, struct as
 	a->el = el;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newfor(struct pcdata* pp, char* index, int start, int end, int step, struct ast* tl)
@@ -319,6 +335,7 @@ struct ast* newfor(struct pcdata* pp, char* index, int start, int end, int step,
 	a->tl = tl;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newforeach(struct pcdata* pp, char* index, char* arr, struct ast* tl)
@@ -335,6 +352,7 @@ struct ast* newforeach(struct pcdata* pp, char* index, char* arr, struct ast* tl
 	a->tl = tl;
 	a->l = NULL;
 	a->r = NULL;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
 struct ast* newcmp(struct pcdata* pp, int cmptype, struct ast* l, struct ast* r)
@@ -348,6 +366,7 @@ struct ast* newcmp(struct pcdata* pp, int cmptype, struct ast* l, struct ast* r)
 	a->nodetype = '0' + cmptype;
 	a->l = l;
 	a->r = r;
+	a->lineno = yyget_lineno(pp->scaninfo);
 	return a;
 }
 
@@ -483,6 +502,7 @@ struct un eval(struct pcdata*pp, struct ast* a)
 			s->charval = 0;
 			s->intval = 0;
 			s->doubval = 0;
+			eval(pp,s->func);
 			return r1;
 		}
 		case 8:
@@ -513,12 +533,12 @@ struct un eval(struct pcdata*pp, struct ast* a)
 		{
 			struct symasgn* asgn = (struct symasgn*)a;
 			struct symbol* s = lookup(pp, asgn->name);
-			if (s == NULL)
+			/*if (s == NULL)
 			{
 				yyerror(pp, "%s variable undefined", asgn->name);
 				exit(0);
 			}
-			r1.type = s->datatype;
+			r1.type = s->datatype;*/
 			struct un tmp = eval(pp, asgn->v);
 			if (tmp.type != r1.type)
 			{

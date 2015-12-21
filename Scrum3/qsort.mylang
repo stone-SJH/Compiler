@@ -25,6 +25,7 @@ let QuickSort(var A as array[10] of int, var size as int)
 _QuickSort(A, 0, size-1); 
 endfunc
 
+let main()
 var a as int;
 var K as array[10] of int;
 var b as int;
@@ -41,3 +42,5 @@ K[7] = 1;
 K[8] = 10;
 K[9] = 11;
 QuickSort(K, b);
+endfunc
+

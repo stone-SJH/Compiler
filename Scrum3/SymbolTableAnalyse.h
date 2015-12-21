@@ -31,11 +31,7 @@ public:
 	para* checkFuncType(string name, int index);
 	para* checkVariable(string name);
 	para* checkType(string name);
-
-	bool checkSymbol(string name);
-	
-	int findType(string name);
-	int findVariable(string name);
+	func* checkFunc(string name);
 
 	SymbolTableAnalyse();
 	void Analyse(ast* root);

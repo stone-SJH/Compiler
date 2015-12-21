@@ -54,6 +54,7 @@ struct ast{
 	int nodetype;
 	struct ast* l;
 	struct ast* r;
+	int lineno;
 };
 //控制流节点，包括while和if
 struct flow:public ast{

@@ -1,5 +1,5 @@
-#ifndef TABLETYPE
-#define TABLETYPE
+#ifndef _TABLETYPE_
+#define _TABLETYPE_
 
 #include <iostream>
 #include <vector>
@@ -15,6 +15,11 @@ struct para{
 	string name;
 	string type;
 	int size;// -1 not array
+};
+
+struct func{
+	string name;
+	int returntype;
 };
 //overall
 class SymbolTable{
@@ -37,7 +42,8 @@ public:
 class FunctionTable{
 public:
 	vector<string> functionName;
-	//vector<string> functionReturn;
+	vector<int> functionReturn;
+	//0 for void; 1 for int; 2 for char; 3 for double 
 	vector<int> functionParaNum;
 	vector<vector<string>> functionParaType;
 	vector<vector<int>> functionParaSize;

@@ -132,7 +132,7 @@ funccallstmt:		FUNC	'('	explist	')' ';'	{$$=newfunc(pp,$1,$3); }
 symlist:		symbol		{$$=newsymlist(pp,$1,NULL);}
 		|	symbol ','  symlist	{ $$=newsymlist(pp,$1,$3); }
 		;
-symbol:
+symbol:       { $$=NULL; }
 		|	VAR NAME AS TYPE { $$=newarg(pp,$2,$4,NULL,-1); }
 		|	VAR NAME AS NAME {$$=newarg(pp,$2,-1,$4,-1); }
 		|	VAR NAME AS	ARRAY	'['	TYPEINT	']'	OF	TYPE	 { $$=newarg(pp,$2,$9,NULL,$6); }
