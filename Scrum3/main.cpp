@@ -177,7 +177,7 @@ int main()
 		cout << "done" << endl;*/
 		IRGeneration* irg = new IRGeneration(root);
 		string ir = irg->Generate();
-		ofstream ofs("IRge_qsort.ll");
+		ofstream ofs("test.ll");
 		ofs << ir << endl;
 		cout << ir << endl;
 	}

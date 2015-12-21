@@ -284,7 +284,11 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 					}
 				}
 				else {
-
+					serr* err = new serr();
+					err->errortype = VARUNDECLARE;
+					err->errorpos = sa->lineno;
+					err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+					se->addErrs(err);
 					return INT_MAX;
 				}
 			}
@@ -305,7 +309,11 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 					}
 				}
 				else{
-
+					serr* err = new serr();
+					err->errortype = VARUNDECLARE;
+					err->errorpos = sa->lineno;
+					err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+					se->addErrs(err);
 					return INT_MAX;
 				}
 			}
@@ -399,7 +407,11 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 					}
 				}
 				else {
-					
+					serr* err = new serr();
+					err->errortype = VARUNDECLARE;
+					err->errorpos = sa->lineno;
+					err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+					se->addErrs(err);
 					return INT_MAX;
 				}
 			}
@@ -480,7 +492,11 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 					}
 				}
 				else{
-					cout << "error!" << endl;
+					serr* err = new serr();
+					err->errortype = VARUNDECLARE;
+					err->errorpos = sa->lineno;
+					err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+					se->addErrs(err);
 					return INT_MAX;
 				}
 			}
@@ -538,6 +554,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 						return INT_MAX;
 					}
 				}
+				else{
+					serr* err = new serr();
+					err->errortype = VARUNDECLARE;
+					err->errorpos = sr->lineno;
+					err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+					se->addErrs(err);
+					return INT_MAX;
+				}
 			}
 			else{
 				para* p = sta->checkVariable(varname);
@@ -572,6 +596,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 							ir += ir1;
 							return INT_MAX;
 						}
+					}
+					else{
+						serr* err = new serr();
+						err->errortype = VARUNDECLARE;
+						err->errorpos = sr->lineno;
+						err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+						se->addErrs(err);
+						return INT_MAX;
 					}
 				}
 			}
@@ -629,6 +661,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 						}
 					}
 				}
+				else{
+					serr* err = new serr();
+					err->errortype = VARUNDECLARE;
+					err->errorpos = sr->lineno;
+					err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+					se->addErrs(err);
+					return INT_MAX;
+				}
 			}
 			else{
 				para* p = sta->checkType(varname);
@@ -669,6 +709,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 							return INT_MAX;
 						}
 					}
+				}
+				else{
+					serr* err = new serr();
+					err->errortype = VARUNDECLARE;
+					err->errorpos = sr->lineno;
+					err->errorinfo = "Variable '" + varname + "' use without declaration.\n";
+					se->addErrs(err);
+					return INT_MAX;
 				}
 			}
 		}
@@ -1062,6 +1110,7 @@ IRGeneration::getFunction(ast* node){
 		return ir;
 	}
 	else{
+
 		return ir;
 	}
 }
@@ -1118,7 +1167,10 @@ IRGeneration::Generate(){
 	string ir1 = "";
 	int pos;
 	int r = getCodeAss(root, pos, ir1);
-	ir += ir1;
+	if (se->checkErrs())
+		ir = se->showErrs();
+	else
+		ir += ir1;
 	return ir;
 }
 
@@ -1135,4 +1187,5 @@ IRGeneration::IRGeneration(ast* rt){
 
 	sta = new SymbolTableAnalyse();
 	sta->Analyse(root);
+	se = new SemanticError();
 }

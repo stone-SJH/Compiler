@@ -5,6 +5,7 @@
 #include "defination.h"
 #include <iostream>
 #include <sstream>
+#include "SemanticError.h"
 using namespace std;
 
 class IRGeneration{
@@ -12,6 +13,8 @@ private:
 	ast* root;
 
 	SymbolTableAnalyse* sta;
+	SemanticError* se;
+
 	int index;
 	bool infunc;
 	int arrayindex;
