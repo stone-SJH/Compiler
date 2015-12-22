@@ -10,8 +10,6 @@ private:
 	TypeTable* tt;
 	VariableTable* vt;
 	FunctionTable* ft;
-	
-
 
 	void AnalyseType(ast* node);
 	void AnalyseFunction(ast* node);
@@ -21,6 +19,7 @@ private:
 	void FuncAnalyseVariable(ast* node, VariableTable* fvt);
 	void FuncAnalyseType(ast* node, TypeTable* ftt);
 	void FuncRead(ast* node, VariableTable* fvt, TypeTable* ftt);
+	void FuncConstant();//change to get more support system function call
 	void _Analyse(ast* node);
 	
 	void PrintSymbolTable();

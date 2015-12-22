@@ -13,7 +13,9 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 	}
 	case 2:
 	{
-
+		struct charcons* cc = (struct charcons*)node;
+		int ret = (int)(cc->ch);
+		return ret;
 	}
 	case 3:
 	{
@@ -342,7 +344,7 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 					int curindexx = index0;
 					if (r != INT_MAX && rr != INT_MAX){
 						int curindex = index;
-						ir1 += getLoadIntPointer(varname);
+						//ir1 += getLoadIntPointer(varname);
 						ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i32]* %" + varname + ", i32 0, i32 0\n";
 						index++;
 						ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
@@ -427,7 +429,7 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 					int curindexx = index0;
 					if (r != INT_MAX && rr != INT_MAX){
 						int curindex = index;
-						ir1 += getLoadIntPointer(varname);
+						//ir1 += getLoadIntPointer(varname);
 						ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) +  " x i32]* %" + varname + ", i32 0, i32 0\n";
 						index++;
 						ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
@@ -527,7 +529,7 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 					else {
 						p = sta->checkFuncType(varname, funcindex);
 						if (p->name != ""){
-							typecode = -1;
+							typecode = -2;
 							arrayindex++;
 						}
 					}
@@ -541,6 +543,10 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 							ir1 = getLoadInt(varname);
 						else if (typecode == -1)
 							ir1 = getLoadIntPointer(varname);
+						else if (typecode == -2){
+							ir1 = "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i32]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+						}
 						ir += ir1;
 						return INT_MAX;
 					}
@@ -550,6 +556,10 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 							ir1 = getLoadChar(varname);
 						else if (typecode == -1)
 							ir1 = getLoadCharPointer(varname);
+						else if (typecode == -2){
+							ir1 = "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i8]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+						}
 						ir += ir1;
 						return INT_MAX;
 					}
@@ -615,7 +625,7 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 				para* p = sta->checkFuncPara(varname, funcindex);
 				if (p->name != ""){
 					varname += ".var";
-					typecode = 0;
+					typecode = -1;
 				}
 				else {
 					p = sta->checkFuncType(varname, funcindex);
@@ -752,6 +762,17 @@ IRGeneration::getInt(int n){
 	return ret;
 }
 
+string
+IRGeneration::getFile(string filename){
+	ifstream ifs(filename);
+	ostringstream buf;
+	char ch;
+	while (buf && ifs.get(ch))
+		buf.put(ch);
+	string ret = buf.str();
+	return ret;
+}
+
 string 
 IRGeneration::getAllocaInt(string name){
 	string ir;
@@ -851,6 +872,31 @@ string
 IRGeneration::getStoreCharPointer(string name, string value){
 	string ir;
 	ir = "  store i8* %" + value + ", i8** %" + name + "\n";
+	return ir;
+}
+
+string 
+IRGeneration::getConstant(){
+	string ir;
+	ir = "@_printa = internal constant [5 x i8] c\"%d  \\00 \", align 1\n";
+	ir += "declare i32 @printf(i8*, ...)\n";
+
+	ir += "\n";
+	return ir;
+}
+
+string
+IRGeneration::getLinkFunc(){
+	string ir;
+	ir = "";
+	int size = linkfiles.size();
+	if (size != 0){
+		for (int i = 0; i < size; i++){
+			ir += getFile(linkfiles[i]);
+			ir += "\n";
+		}
+	}
+	ir += "\n";
 	return ir;
 }
 
@@ -1165,6 +1211,8 @@ string
 IRGeneration::Generate(){
 	string ir;
 	string ir1 = "";
+	ir += getConstant();
+	ir += getLinkFunc();
 	int pos;
 	int r = getCodeAss(root, pos, ir1);
 	if (se->checkErrs())
@@ -1184,8 +1232,15 @@ IRGeneration::IRGeneration(ast* rt){
 	cmpindex = 0;
 	funcindex = 0;
 	root = rt;
-
+	linkfiles.push_back("linkfile.txt");
 	sta = new SymbolTableAnalyse();
 	sta->Analyse(root);
 	se = new SemanticError();
+}
+
+void
+IRGeneration::AddLinkFile(string filename){
+	if (filename != "")
+		linkfiles.push_back(filename);
+	return;
 }

@@ -143,6 +143,33 @@ SymbolTableAnalyse::AnalyseFunction(ast* node){
 	ft->functionType.push_back(ftt);
 }
 
+void
+SymbolTableAnalyse::FuncConstant(){
+	string _name;
+	int _para_num;
+	vector<string> _para_name;
+	vector<int> _para_size;
+	vector<string> _para_type;
+	/*printa*/
+	_name = "printa";
+	_para_num = 2;
+	_para_name.push_back("arr");
+	_para_name.push_back("n");
+	_para_size.push_back(10000);
+	_para_size.push_back(-1);
+	_para_type.push_back("integer");
+	_para_type.push_back("integer");
+	ft->functionName.push_back(_name);
+	st->symbolName.push_back(_name);
+	st->symbolType.push_back(FUNCTION);
+	ft->functionParaNum.push_back(_para_num);
+	ft->functionParaName.push_back(_para_name);
+	ft->functionParaSize.push_back(_para_size);
+	ft->functionParaType.push_back(_para_type);
+	/*...*/
+
+}
+
 void 
 SymbolTableAnalyse::_Analyse(ast* node){
 	if (node == NULL)
@@ -179,6 +206,7 @@ SymbolTableAnalyse::_Analyse(ast* node){
 void 
 SymbolTableAnalyse::Analyse(ast* root){
 	_Analyse(root);
+	FuncConstant();
 }
 
 SymbolTableAnalyse::SymbolTableAnalyse(){

@@ -42,5 +42,6 @@ K[7] = 1;
 K[8] = 10;
 K[9] = 11;
 QuickSort(K, b);
+printa(K, b);
 endfunc
 

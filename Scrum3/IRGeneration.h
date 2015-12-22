@@ -5,6 +5,7 @@
 #include "defination.h"
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include "SemanticError.h"
 using namespace std;
 
@@ -15,6 +16,7 @@ private:
 	SymbolTableAnalyse* sta;
 	SemanticError* se;
 
+	vector<string> linkfiles;
 	int index;
 	bool infunc;
 	int arrayindex;
@@ -25,6 +27,7 @@ private:
 	int funcindex;
 
 	string getInt(int n);
+	string getFile(string filename);
 
 	int getCodeAss(ast* node, int& index, string& ir);
 	string getAllocaInt(string name);
@@ -41,6 +44,8 @@ private:
 	string getLoadCharPointer(string name);
 	string getStoreChar(string name, string value);
 	string getStoreCharPointer(string name, string value);
+	string getConstant();
+	string getLinkFunc();
 	string getCmp(ast* node, int curwhileindex);
 	string getWhile(ast* node);
 	string getIfCmp(ast* node, bool elseexist, int curifindex, int curelseindex);
@@ -50,6 +55,7 @@ private:
 	string getCall(ast* node);
 public:
 	IRGeneration(ast* root);
+	void AddLinkFile(string filename);
 	string Generate();
 
 };
