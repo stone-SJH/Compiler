@@ -1098,7 +1098,7 @@ IRGeneration::getFunction(ast* node){
 			index++;
 			ir4 += "  store i32 0, i32* %" + getInt(curindex) + "\n";
 			curindex = index;
-			ir4 += getLoadInt(getInt(curindex));
+			ir4 += getLoadInt(getInt(curindex - 1));
 			ir4 += "  ret i32 %" + getInt(curindex) + "\n";
 			/*end*/
 		}
