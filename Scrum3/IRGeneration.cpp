@@ -2,7 +2,7 @@
 #include <limits.h>
 
 int
-IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
+IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& db){
 	switch (node->nodetype){
 	case 1:
 	{
@@ -71,12 +71,16 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 	{
 		int r1 = INT_MAX;
 		int r2 = INT_MAX;
+		char c1;
+		char c2;
+		double d1;
+		double d2;
 		int curindex1;
 		int curindex2;
 		string ir1;
-		r1 = getCodeAss(node->l, index0, ir);
+		r1 = getCodeAss(node->l, index0, ir, c1, d1);
 		curindex1 = index0;
-		r2 = getCodeAss(node->r, index0, ir);
+		r2 = getCodeAss(node->r, index0, ir, c2, d2);
 		curindex2 = index0;
 		if (r1 != INT_MAX && r2 != INT_MAX){
 			ir1 = "  %" + getInt(index) + " = add nsw i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
@@ -108,12 +112,16 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 	{
 		int r1 = INT_MAX;
 		int r2 = INT_MAX;
+		char c1;
+		char c2;
+		double d1;
+		double d2;
 		int curindex1;
 		int curindex2;
 		string ir1;
-		r1 = getCodeAss(node->l, index0, ir);
+		r1 = getCodeAss(node->l, index0, ir, c1, d1);
 		curindex1 = index0;
-		r2 = getCodeAss(node->r, index0, ir);
+		r2 = getCodeAss(node->r, index0, ir, c2, d2);
 		curindex2 = index0;
 		if (r1 != INT_MAX && r2 != INT_MAX){
 			ir1 = "  %" + getInt(index) + " = sub nsw i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
@@ -145,12 +153,16 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 	{
 		int r1 = INT_MAX;
 		int r2 = INT_MAX;
+		char c1;
+		char c2;
+		double d1;
+		double d2;
 		int curindex1;
 		int curindex2;
 		string ir1;
-		r1 = getCodeAss(node->l, index0, ir);
+		r1 = getCodeAss(node->l, index0, ir, c1, d1);
 		curindex1 = index0;
-		r2 = getCodeAss(node->r, index0, ir);
+		r2 = getCodeAss(node->r, index0, ir, c2, d2);
 		curindex2 = index0;
 		if (r1 != INT_MAX && r2 != INT_MAX){
 			ir1 = "  %" + getInt(index) + " = mul nsw i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
@@ -182,12 +194,16 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 	{
 		int r1 = INT_MAX;
 		int r2 = INT_MAX;
+		char c1;
+		char c2;
+		double d1;
+		double d2;
 		int curindex1;
 		int curindex2;
 		string ir1;
-		r1 = getCodeAss(node->l, index0, ir);
+		r1 = getCodeAss(node->l, index0, ir, c1, d1);
 		curindex1 = index0;
-		r2 = getCodeAss(node->r, index0, ir);
+		r2 = getCodeAss(node->r, index0, ir, c2, d2);
 		curindex2 = index0;
 		if (r1 != INT_MAX && r2 != INT_MAX){
 			ir1 = "  %" + getInt(index) + " = sdiv i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
@@ -219,12 +235,16 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 	{
 		int r1 = INT_MAX;
 		int r2 = INT_MAX;
+		char c1;
+		char c2;
+		double d1;
+		double d2;
 		int curindex1;
 		int curindex2;
 		string ir1;
-		r1 = getCodeAss(node->l, index0, ir);
+		r1 = getCodeAss(node->l, index0, ir, c1, d1);
 		curindex1 = index0;
-		r2 = getCodeAss(node->r, index0, ir);
+		r2 = getCodeAss(node->r, index0, ir, c2, d2);
 		curindex2 = index0;
 		if (r1 != INT_MAX && r2 != INT_MAX){
 			ir1 = "  %" + getInt(index) + " = srem i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
@@ -273,7 +293,9 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 				}
 				if (typecode == 0){
 					int r = INT_MAX;
-					r = getCodeAss(sa->v, index0, ir);
+					char c;
+					double d;
+					r = getCodeAss(sa->v, index0, ir, c, d);
 					if (r != INT_MAX){
 						string ir1 = "  store i32 " + getInt(r) + ", i32* %" + varname + "\n";
 						ir += ir1;
@@ -298,7 +320,9 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 				para* p = sta->checkVariable(varname);
 				if (p->name != ""){
 					int r = INT_MAX;
-					r = getCodeAss(sa->v, index0, ir);
+					char c;
+					double d;
+					r = getCodeAss(sa->v, index0, ir, c, d);
 					if (r != INT_MAX){
 						string ir1 = "  store i32 " + getInt(r) + ", i32* %" + varname + "\n";
 						ir += ir1;
@@ -337,10 +361,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 				if (typecode == 0){
 					string ir1;
 					int r = INT_MAX;
-					r = getCodeAss(indexnode, index0, ir1);
+					char c1;
+					double d1;
+					r = getCodeAss(indexnode, index0, ir1, c1, d1);
 					int curindex = index0;
 					int rr = INT_MAX;
-					rr = getCodeAss(sa->v, index0, ir1);
+					char c2;
+					double d2;
+					rr = getCodeAss(sa->v, index0, ir1, c2, d2);
 					int curindexx = index0;
 					if (r != INT_MAX && rr != INT_MAX){
 						int curindex = index;
@@ -422,10 +450,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 				if (p->name != ""){
 					string ir1;
 					int r = INT_MAX;
-					r = getCodeAss(indexnode, index0, ir1);
+					char c1;
+					double d1;
+					r = getCodeAss(indexnode, index0, ir1, c1, d1);
 					int curindex = index0;
 					int rr = INT_MAX;
-					rr = getCodeAss(sa->v, index0, ir1);
+					char c2;
+					double d2;
+					rr = getCodeAss(sa->v, index0, ir1, c2, d2);
 					int curindexx = index0;
 					if (r != INT_MAX && rr != INT_MAX){
 						int curindex = index;
@@ -636,7 +668,9 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 				if (typecode != 1){
 					string ir1;
 					int r = INT_MAX;
-					r = getCodeAss(indexnode, index0, ir1);
+					char c;
+					double d;
+					r = getCodeAss(indexnode, index0, ir1, c, d);
 					if (r != INT_MAX){
 						if (p->type == "integer"){
 							int curindex = index;
@@ -685,7 +719,9 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 				if (p->name != ""){
 					string ir1;
 					int r = INT_MAX;
-					r = getCodeAss(indexnode, index0, ir1);
+					char c;
+					double d;
+					r = getCodeAss(indexnode, index0, ir1, c, d);
 					if (r != INT_MAX){
 						if (p->type == "integer"){
 							int curindex = index;
@@ -747,8 +783,8 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir){
 	}
 	case 'L':
 	{
-		getCodeAss(node->l, index0, ir);
-		getCodeAss(node->r, index0, ir);
+		getCodeAss(node->l, index0, ir, ch, db);
+		getCodeAss(node->r, index0, ir, ch, db);
 	}
 	}
 	return INT_MAX;
@@ -917,7 +953,9 @@ IRGeneration::getWhile(ast* node){
 	ir1 = getCmp(cmpnode, curwhileindex);
 	int pos;
 	ir2 = "";
-	int r = getCodeAss(maincode, pos, ir2);
+	char c;
+	double d;
+	int r = getCodeAss(maincode, pos, ir2, c, d);
 	ir += ir1;
 	ir += ir2;
 	ir += "  br label %" + getInt(curindex) + "\n\n";
@@ -953,10 +991,14 @@ IRGeneration::getCmp(ast* node, int curwhileindex){
 		break;
 	}
 	int pos0, pos1;
+	char c1;
+	char c2;
+	double d1;
+	double d2;
 	string ir1 = "";
-	int r1 = getCodeAss(node->l, pos0, ir1);
+	int r1 = getCodeAss(node->l, pos0, ir1, c1, d1);
 	string ir2 = "";
-	int r2 = getCodeAss(node->r, pos1, ir2);
+	int r2 = getCodeAss(node->r, pos1, ir2, c2, d2);
 	ir = "";
 	ir += ir1;
 	ir += ir2;
@@ -990,12 +1032,16 @@ IRGeneration::getIf(ast* node){
 	int pos0;
 	int pos1;
 	ir2 = "";
-	int r = getCodeAss(ifnode, pos0, ir2);
+	char c1;
+	double d1;
+	int r = getCodeAss(ifnode, pos0, ir2, c1, d1);
 	if (elseexist){
 		ir3 = "";
 		ir3 += "else" + getInt(curelseindex) + ":\n";
 		string ir4 = "";
-		int rr = getCodeAss(elsenode, pos1, ir4);
+		char c2;
+		double d2;
+		int rr = getCodeAss(elsenode, pos1, ir4, c2, d2);
 		ir3 += ir4;
 		ir3 += "  br label %ifend" + getInt(curifindex) + "\n\n";
 	}
@@ -1041,8 +1087,12 @@ IRGeneration::getIfCmp(ast* node, bool elseexist, int curifindex, int curelseind
 	string ir1 = "";
 	string ir2 = "";
 	int r1, r2;
-	r1 = getCodeAss(node->l, pos0, ir1);
-	r2 = getCodeAss(node->r, pos1, ir2);
+	char c1;
+	char c2;
+	double d1;
+	double d2;
+	r1 = getCodeAss(node->l, pos0, ir1, c1, d1);
+	r2 = getCodeAss(node->r, pos1, ir2, c2, d2);
 	if (!elseexist){
 		ir = "";
 		ir += ir1;
@@ -1132,7 +1182,9 @@ IRGeneration::getFunction(ast* node){
 		int pos;
 		ast* funcnode = fn->tl;
 		ir3 = "";
-		int r = getCodeAss(funcnode, pos, ir3);
+		char c;
+		double d;
+		int r = getCodeAss(funcnode, pos, ir3, c, d);
 		string ir4;
 		if (f->returntype == 0){
 			ir4 = "  ret void\n";
@@ -1191,7 +1243,9 @@ IRGeneration::getCallAss(ast* node, string& ir1, string& ir2){
 	else{
 		int pos;
 		int curarrayindex = arrayindex;
-		int r = getCodeAss(node, pos, ir2);
+		char c;
+		double d;
+		int r = getCodeAss(node, pos, ir2, c, d);
 		if (r == INT_MAX){
 			if (curarrayindex == arrayindex){
 				ir1 += "i32 %" + getInt(pos) + ", ";
@@ -1214,7 +1268,9 @@ IRGeneration::Generate(){
 	ir += getConstant();
 	ir += getLinkFunc();
 	int pos;
-	int r = getCodeAss(root, pos, ir1);
+	char c;
+	double d;
+	int r = getCodeAss(root, pos, ir1, c, d);
 	if (se->checkErrs())
 		ir = se->showErrs();
 	else

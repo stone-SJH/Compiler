@@ -29,7 +29,7 @@ private:
 	string getInt(int n);
 	string getFile(string filename);
 
-	int getCodeAss(ast* node, int& index, string& ir);
+	int getCodeAss(ast* node, int& index, string& ir, char& ch, double& db);
 	string getAllocaInt(string name);
 	string getAllocaIntPointer(string name);
 	string getAllocaIntArray(string name, int size);
