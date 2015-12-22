@@ -1,4 +1,4 @@
-@_printa = internal constant [5 x i8] c"%d  \00 ", align 1
+@_printa = internal constant [5 x i8] c"%d  \00", align 1
 declare i32 @printf(i8*, ...)
 
 define void @printa(i32* %arr, i32 %n) nounwind {

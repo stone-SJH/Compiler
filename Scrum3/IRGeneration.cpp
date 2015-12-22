@@ -878,7 +878,7 @@ IRGeneration::getStoreCharPointer(string name, string value){
 string 
 IRGeneration::getConstant(){
 	string ir;
-	ir = "@_printa = internal constant [5 x i8] c\"%d  \\00 \", align 1\n";
+	ir = "@_printa = internal constant [5 x i8] c\"%d  \\00\", align 1\n";
 	ir += "declare i32 @printf(i8*, ...)\n";
 
 	ir += "\n";

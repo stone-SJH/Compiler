@@ -151,37 +151,33 @@ QuickSort:                              # @QuickSort
 main:                                   # @main
 .Leh_func_begin3:
 # BB#0:
-	pushq	%r14
-.Llabel3:
 	pushq	%rbx
+.Llabel3:
+	subq	$64, %rsp
 .Llabel4:
-	subq	$56, %rsp
-.Llabel5:
-	movl	$1, 52(%rsp)
-	movl	$10, 8(%rsp)
-	movl	$4, 12(%rsp)
-	movl	$2, 16(%rsp)
+	movl	$1, 60(%rsp)
+	movl	$10, 16(%rsp)
 	movl	$4, 20(%rsp)
-	movl	$6, 24(%rsp)
-	movl	$1, 28(%rsp)
-	movl	$3, 32(%rsp)
-	movl	$9, 36(%rsp)
-	movl	$1, 40(%rsp)
-	movl	$10, 44(%rsp)
-	movl	$11, 48(%rsp)
-	movl	8(%rsp), %ebx
-	leaq	12(%rsp), %r14
-	movq	%r14, %rdi
-	movl	%ebx, %esi
+	movl	$2, 24(%rsp)
+	movl	$4, 28(%rsp)
+	movl	$6, 32(%rsp)
+	movl	$1, 36(%rsp)
+	movl	$3, 40(%rsp)
+	movl	$9, 44(%rsp)
+	movl	$1, 48(%rsp)
+	movl	$10, 52(%rsp)
+	movl	$11, 56(%rsp)
+	movl	16(%rsp), %esi
+	leaq	20(%rsp), %rbx
+	movq	%rbx, %rdi
 	callq	QuickSort
-	movq	%r14, %rdi
-	movl	%ebx, %esi
+	movl	16(%rsp), %esi
+	movq	%rbx, %rdi
 	callq	printa
-	movl	$0, 4(%rsp)
+	movl	$0, 12(%rsp)
 	xorl	%eax, %eax
-	addq	$56, %rsp
+	addq	$64, %rsp
 	popq	%rbx
-	popq	%r14
 	ret
 	.size	main, .-main
 .Leh_func_end3:
@@ -269,15 +265,8 @@ _printa:                                # @_printa
 	.set	.Lset11eh,.Llabel4-.Llabel3
 	.long	.Lset11eh
 	.byte	14                      # CFA_def_cfa_offset
-	.uleb128	24              # Offset
-	.byte	4                       # CFA_advance_loc4
-	.set	.Lset12eh,.Llabel5-.Llabel4
-	.long	.Lset12eh
-	.byte	14                      # CFA_def_cfa_offset
 	.uleb128	80              # Offset
 	.byte	131                     # DW_CFA_offset + Reg (3)
-	.uleb128	3               # Offset
-	.byte	142                     # DW_CFA_offset + Reg (14)
 	.uleb128	2               # Offset
 	.align	8
 .Leh_frame_end3:
