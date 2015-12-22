@@ -1,0 +1,3 @@
+0.添加printf/printa作为内置函数
+1.去掉%x = load i32** %K
+2.return 0 好像有问题？检查
