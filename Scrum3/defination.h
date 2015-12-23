@@ -91,6 +91,7 @@ struct ufncall:public ast {
 	//1
 	struct ast* tl;
 	char* name;
+	char* fname;//------------------------change------------------------------------如果是类函数，则为类的名字，否则为NULL
 };
 //char 常量
 struct charcons:public ast{
@@ -126,6 +127,7 @@ struct fndec:public ast{
 	char* name;
 	struct symlist* s;
 	struct ast* tl;
+	int type;   //0 (char) , 1 (int) , 2(double),-1(void)  -----------------------------------change-----------------------------------------
 };
 //类声明（相当于变量声明，var a as tt，只不过tt是一个class而已）
 struct csdec :public ast{
@@ -169,7 +171,7 @@ struct singlestring :public ast{
 };
 
 struct ast* newfunc(struct pcdata*, int functype, struct ast* l);
-struct ast* newcall(struct pcdata*, char* s, struct ast* l);
+struct ast* newcall(struct pcdata*, char* fname,char* s, struct ast* l);  //------change---------对应定义的修改
 struct ast* newint(struct pcdata*, int num);
 struct ast* newdoub(struct pcdata*, double d);
 struct ast* newchar(struct pcdata*, char ch);
@@ -179,7 +181,7 @@ struct ast* newclass(struct pcdata*, char* vname, char* cname);
 struct ast* newclassdef(struct pcdata*, char* cname, char* fname, struct ast* tl);
 struct ast* newcsget(struct pcdata*, char* cname, char* kname,int func,struct ast* explist,struct ast* index);
 struct ast* newasgn(struct pcdata*,char* cname, char* name, struct ast* v,struct ast* index);
-struct ast* dodef(struct pcdata*, char* name, struct symlist* syms, struct ast* stmts);
+struct ast* dodef(struct pcdata*, int type,char* name, struct symlist* syms, struct ast* stmts);//-------change---------对应定义的修改
 struct ast* newref(struct pcdata*, char* name,struct ast* index);
 
 struct ast* newast(struct pcdata*, int nodetype,struct ast* l, struct ast* r);

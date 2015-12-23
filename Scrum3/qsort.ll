@@ -222,18 +222,14 @@ define i32 @main() {
   %19 = getelementptr inbounds[10 x i32]* %K, i32 0, i32 0
   %20 = getelementptr inbounds i32* %19, i64 9
   store i32 11, i32* %20
-  %21 = load i32* %b
-  %22 = getelementptr inbounds [10 x i32]* %K, i32 0, i32 0
-  call void @QuickSort(i32* %22, i32 %21)
+  %21 = getelementptr inbounds[10 x i32]* %K, i32 0, i32 0
+  call void @QuickSort(i32* %21, i32 10)
 
+  %22 = getelementptr inbounds[10 x i32]* %K, i32 0, i32 0
   %23 = load i32* %b
-  %24 = getelementptr inbounds [10 x i32]* %K, i32 0, i32 0
-  call void @printa(i32* %22, i32 %21)
+  call void @printa(i32* %22, i32 %23)
 
-  %25 = alloca i32, align 4
-  store i32 0, i32* %25
-  %26 = load i32* %25
-  ret i32 %26
+  ret i32 0
 }
 
 

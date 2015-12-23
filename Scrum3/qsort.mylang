@@ -1,4 +1,4 @@
-let  _QuickSort(var A as array[10] of int, var iLo as int, var iHi as int)
+void let  _QuickSort(var A as array[10] of int, var iLo as int, var iHi as int)
 var Lo as int;
 var Hi as int;
 var Mid as int;
@@ -21,11 +21,11 @@ if (Hi > iLo) then _QuickSort(A, iLo, Hi); endif
 if (Lo < iHi) then _QuickSort(A, Lo, iHi); endif
 endfunc
 
-let QuickSort(var A as array[10] of int, var size as int) 
+void let QuickSort(var A as array[10] of int, var size as int) 
 _QuickSort(A, 0, size-1); 
 endfunc
 
-let main()
+int let main()
 var a as int;
 var K as array[10] of int;
 var b as int;
@@ -41,7 +41,7 @@ K[6] = 9;
 K[7] = 1;
 K[8] = 10;
 K[9] = 11;
-QuickSort(K, b);
+QuickSort(K, 10);
 printa(K, b);
+return 0;
 endfunc
-

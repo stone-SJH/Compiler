@@ -227,7 +227,7 @@ void
 SymbolTableAnalyse::AnalyseFunction(ast* node){
 	struct fndec* f = (struct fndec*) node;
 	string _name;
-	//string _return;
+	int _return;
 	int _para_num;
 	vector<string> _para_name;
 	vector<int> _para_size;
@@ -237,6 +237,7 @@ SymbolTableAnalyse::AnalyseFunction(ast* node){
 	bool _funcstate;
 
 	_name = f->name;
+	_return = f->type;
 	int size = st->symbolName.size();
 	bool error = false;
 	string retype;
@@ -249,14 +250,18 @@ SymbolTableAnalyse::AnalyseFunction(ast* node){
 	}
 
 	if (!error){
-		/*here need to change*/
-		if (_name == "main"){
-			ft->functionReturn.push_back(1);
-		}
-		else {
+		if (_return == -1){
 			ft->functionReturn.push_back(0);
 		}
-		/*end*/
+		else if (_return == 0){
+			ft->functionReturn.push_back(2);
+		}
+		else if (_return == 1){
+			ft->functionReturn.push_back(1);
+		}
+		else if (_return == 2){
+			ft->functionReturn.push_back(3);
+		}
 		ft->functionName.push_back(_name);
 		st->symbolName.push_back(_name);
 		st->symbolType.push_back(FUNCTION);

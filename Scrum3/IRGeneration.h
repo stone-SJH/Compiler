@@ -26,6 +26,7 @@ private:
 	int cmpindex;
 	int funcindex;
 	int paraindex;
+	int retcons;
 
 	string getInt(int n);
 	string getFile(string filename);
@@ -53,7 +54,7 @@ private:
 	string getIf(ast* node);
 	string getFunction(ast* node);
 	void getCallAss(ast* node, string& ir1, string& ir2, int findex);
-	string getCall(ast* node);
+	string getCall(ast* node, int& pos);
 public:
 	IRGeneration(ast* root);
 	void AddLinkFile(string filename);

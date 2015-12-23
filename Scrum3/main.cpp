@@ -11,7 +11,7 @@ void _read(ast* cur){
 	if (cur->nodetype == '2'){
 		cout << "!!" << (char)cur->l->nodetype << endl;
 		cout << "!!" << (char)cur->r->nodetype << endl;
-	} 
+	}
 	if (cur->nodetype == 1){
 		struct ufncall* ufn = (struct ufncall*)cur;
 		cout << "call: " << ufn->name << endl;
@@ -34,11 +34,11 @@ void _read(ast* cur){
 		struct var* v = (struct var*)cur;
 		cout << v->name << endl;
 		return;
-	}	
+	}
 	if (cur->nodetype == 6){
 		struct arr* array = (struct arr*)cur;
 		cout << "array: " << array->name << endl;
-		
+
 		return;
 	}
 	if (cur->nodetype == '+'){
@@ -148,36 +148,40 @@ int main()
 		return 0;
 	}
 	p.symtab = symtab;
-	
+
 	for (int i = 0; i < MAX; i++)
-			p.symtab[i] = NULL;
+		p.symtab[i] = NULL;
 	string filename;
 	for (;;){
 		cout << "input the filename>";
 		cin >> filename;
 		FILE* f;
-		fopen_s(&f,filename.c_str(), "r");
+		fopen_s(&f, filename.c_str(), "r");
 		yyset_in(f, p.scaninfo);
 		yyparse(&p);
 		ast* root = p.ast;
 		//SymbolTableAnalyse* sta = new SymbolTableAnalyse();
- 		//sta->Analyse(root);
-		
+		//sta->Analyse(root);
+
 		/*if (p.ast){
-			eval(&p, p.ast);
-			//treefree(&p, p.ast);
-			p.ast = NULL;
+		eval(&p, p.ast);
+		//treefree(&p, p.ast);
+		p.ast = NULL;
 		}*/
 		/*if (root != NULL){
-			cout << root->nodetype << endl;
-			read(root);
-			//cout << root->l->nodetype << endl;
-			//read(root->r);
+		cout << root->nodetype << endl;
+		read(root);
+		//cout << root->l->nodetype << endl;
+		//read(root->r);
 		}
 		cout << "done" << endl;*/
 		IRGeneration* irg = new IRGeneration(root);
 		string ir = irg->Generate();
-		ofstream ofs("test.ll");
+		char dstName[100];
+		memset(dstName, 0, 100);
+		int pos = filename.find(".");
+		sprintf_s(dstName, "%s.ll", filename.substr(0,pos).c_str());
+		ofstream ofs(dstName);
 		ofs << ir << endl;
 		cout << ir << endl;
 	}

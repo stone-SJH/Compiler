@@ -3,11 +3,13 @@
 
 int
 IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& db){
+	if (node == NULL)
+		return INT_MAX;
 	switch (node->nodetype){
 	case 1:
 	{
 		string ir1;
-		ir1 = getCall(node);
+		ir1 = getCall(node, index0);
 		ir += ir1;
 		return INT_MAX;
 	}
@@ -781,10 +783,33 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 		ir += ir1;
 		return INT_MAX;
 	}
+	case 'R':
+	{
+		if (infunc){
+			ast* retnode = node->l;
+			int r;
+			if (retnode != NULL){
+				r = getCodeAss(retnode, index0, ir, ch, db);
+				if (r != INT_MAX){
+					index0 = r;
+					retcons = 1;
+				}
+			}
+			else
+				r = INT_MAX;
+			return r;
+		}
+		else{
+			//error
+			return INT_MAX;
+		}
+	}
 	case 'L':
 	{
-		getCodeAss(node->l, index0, ir, ch, db);
-		getCodeAss(node->r, index0, ir, ch, db);
+		if (node->l != NULL)
+			getCodeAss(node->l, index0, ir, ch, db);
+		if (node->r != NULL)
+			getCodeAss(node->r, index0, ir, ch, db);
 	}
 	}
 	return INT_MAX;
@@ -1002,7 +1027,14 @@ IRGeneration::getCmp(ast* node, int curwhileindex){
 	ir = "";
 	ir += ir1;
 	ir += ir2;
-	ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", %" + getInt(pos1) + "\n";
+	if (r1 == INT_MAX && r2 == INT_MAX)
+		ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", %" + getInt(pos1) + "\n";
+	else if (r1 != INT_MAX && r2 == INT_MAX)
+		ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 " + getInt(r1) + ", %" + getInt(pos1) + "\n";
+	else if (r1 == INT_MAX && r2 != INT_MAX)
+		ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", " + getInt(r2) + "\n";
+	else if (r1 != INT_MAX && r2 != INT_MAX)
+		ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
 	ir += "  br i1 %" + getInt(index) + ", label %" + getInt(index + 1) + ", label %whileend" + getInt(curwhileindex) + "\n\n";
 	ir += "; <label>:" + getInt(index + 1) + "\n";
 	index += 2;
@@ -1096,8 +1128,14 @@ IRGeneration::getIfCmp(ast* node, bool elseexist, int curifindex, int curelseind
 	if (!elseexist){
 		ir = "";
 		ir += ir1;
-		ir += ir2;
-		ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", %" + getInt(pos1) + "\n";
+		ir += ir2; if (r1 == INT_MAX && r2 == INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", %" + getInt(pos1) + "\n";
+		else if (r1 != INT_MAX && r2 == INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 " + getInt(r1) + ", %" + getInt(pos1) + "\n";
+		else if (r1 == INT_MAX && r2 != INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", " + getInt(r2) + "\n";
+		else if (r1 != INT_MAX && r2 != INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
 		ir += "  br i1 %" + getInt(index) + ", label %" + getInt(index + 1) + ", label %ifend" + getInt(curifindex) + "\n\n";
 		ir += "; <label>:" + getInt(index + 1) + "\n";
 		index += 2;
@@ -1105,8 +1143,14 @@ IRGeneration::getIfCmp(ast* node, bool elseexist, int curifindex, int curelseind
 	else{
 		ir = "";
 		ir += ir1;
-		ir += ir2;
-		ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", %" + getInt(pos1) + "\n";
+		ir += ir2; if (r1 == INT_MAX && r2 == INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", %" + getInt(pos1) + "\n";
+		else if (r1 != INT_MAX && r2 == INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 " + getInt(r1) + ", %" + getInt(pos1) + "\n";
+		else if (r1 == INT_MAX && r2 != INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 %" + getInt(pos0) + ", " + getInt(r2) + "\n";
+		else if (r1 != INT_MAX && r2 != INT_MAX)
+			ir += "  %" + getInt(index) + " = icmp " + symbol + " i32 " + getInt(r1) + ", " + getInt(r2) + "\n";
 		ir += "  br i1 %" + getInt(index) + ", label %" + getInt(index + 1) + ", label %else" + getInt(curelseindex) + "\n\n";
 		ir += "; <label>:" + getInt(index + 1) + "\n";
 		index += 2;
@@ -1130,6 +1174,12 @@ IRGeneration::getFunction(ast* node){
 		}
 		else if (f->returntype == 1){
 			ir1 = "define i32 @" + name + "(";
+		}
+		else if (f->returntype == 2){
+			ir1 = "define i8 @" + name + "(";
+		}
+		else if (f->returntype == 3){
+			//[TODO]
 		}
 		ir2 = "";
 		while (paralist->cur != NULL){
@@ -1190,15 +1240,14 @@ IRGeneration::getFunction(ast* node){
 			ir4 = "  ret void\n";
 		}
 		else if (f->returntype == 1){
-			/*here need to change*/
-			int curindex = index;
-			ir4 = getAllocaInt(getInt(index));
-			index++;
-			ir4 += "  store i32 0, i32* %" + getInt(curindex) + "\n";
-			curindex = index;
-			ir4 += getLoadInt(getInt(curindex - 1));
-			ir4 += "  ret i32 %" + getInt(curindex) + "\n";
-			/*end*/
+			if (retcons == 0)
+				ir4 += "  ret i32 %" + getInt(pos) + "\n";
+			else
+				ir4 += "  ret i32 " + getInt(pos) + "\n";
+			retcons = 1;
+		}
+		else if (f->returntype == 2){
+			ir4 += "  ret i8 %" + getInt(pos) + "\n";
 		}
 		ir4 += "}\n\n";
 		ir = ir1 + ir2 + ir3 + ir4;
@@ -1214,10 +1263,11 @@ IRGeneration::getFunction(ast* node){
 }
 
 string
-IRGeneration::getCall(ast* node){
+IRGeneration::getCall(ast* node, int& pos){
 	string ir;
 	string ir1;
 	string ir2;
+	string ir3;
 	struct ufncall* ufn = (struct ufncall*)node;
 	int line = node->lineno;
 	string funcname = ufn->name;
@@ -1226,9 +1276,28 @@ IRGeneration::getCall(ast* node){
 	if (f->name != ""){
 		int findex = f->index;
 		ast* paranode = ufn->tl;
-		ir1 = "  call void @" + funcname + "(";
+		ir3 = "";
 		ir2 = "";
-		getCallAss(paranode, ir1, ir2, findex);
+		getCallAss(paranode, ir3, ir2, findex);
+
+		string rettype;
+		if (f->returntype == 0)
+			rettype = "void";
+		else if (f->returntype == 1)
+			rettype = "i32";
+		else if (f->returntype == 2)
+			rettype = "i8";
+		if (f->returntype != 0){
+			pos = index;
+			ir1 = "  %" + getInt(index) + " = ";
+			index++;
+		}
+		else {
+			ir1 = "  ";
+		}
+		ir1 += "call " + rettype + " @" + funcname + "(";
+		ir1 += ir3;
+
 		if (paraindex != f->paranum){
 			serr* err = new serr();
 			err->errortype = PARANUMERR;
@@ -1338,6 +1407,7 @@ IRGeneration::IRGeneration(ast* rt){
 	cmpindex = 0;
 	funcindex = 0;
 	paraindex = 0;
+	retcons = 0;
 	root = rt;
 	linkfiles.push_back("linkfile.txt");
 	se = new SemanticError();

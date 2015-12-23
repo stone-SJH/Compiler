@@ -71,8 +71,9 @@ EXP ([Ee][-+]?[0-9]+)
 "as"		{ return AS;}
 "of"		{ return OF;}
 "char"	{ yylval->type=0; return TYPE;  }
-"int"	{ yylval->type=1; return TYPE; }
-"double"	{ yylval->type=2;return TYPE; }
+"int"	{ yylval->type = 1; return TYPE; }
+"double"	{ yylval->type = 2; return TYPE; }
+"void" { yylval->type = -1; return TYPE; }
 "array"	{ return ARRAY; }
 
 "sqrt"	{ yylval->fn=B_sqrt; return FUNC; }

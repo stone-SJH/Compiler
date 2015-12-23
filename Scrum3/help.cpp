@@ -151,7 +151,7 @@ struct ast* newarr(struct pcdata* pp, char* name, int type, int size)
 	ar->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)ar;
 }
-struct ast* dodef(struct pcdata* pp, char* name, struct symlist* syms, struct ast*func)
+struct ast* dodef(struct pcdata* pp, int type,char* name, struct symlist* syms, struct ast*func)
 {
 	struct fndec * a = (struct fndec*)malloc(sizeof(struct fndec));
 	if (!a)
@@ -163,6 +163,7 @@ struct ast* dodef(struct pcdata* pp, char* name, struct symlist* syms, struct as
 	a->s = syms;
 	a->name = name;
 	a->tl= func;
+	a->type = type;
 	a->l = NULL;
 	a->r = NULL; 
 	a->lineno = yyget_lineno(pp->scaninfo);
@@ -255,7 +256,7 @@ struct ast* newfunc(struct pcdata* pp, int functype, struct ast* l)
 	a->lineno = yyget_lineno(pp->scaninfo);
 	return (struct ast*)a;
 }
-struct ast* newcall(struct pcdata*pp, char* s, struct ast* l)
+struct ast* newcall(struct pcdata*pp, char* fname,char* s, struct ast* l)
 {
 	struct ufncall* a = (struct ufncall*)malloc(sizeof(struct ufncall));
 	if (!a)
@@ -266,6 +267,7 @@ struct ast* newcall(struct pcdata*pp, char* s, struct ast* l)
 	a->nodetype = 1;
 	a->tl = l;
 	a->name = s;
+	a->fname = fname;
 	a->l = NULL;
 	a->r = NULL;
 	a->lineno = yyget_lineno(pp->scaninfo);
@@ -1088,7 +1090,7 @@ void yyerror(struct pcdata* pp, char* s, ...)
 {
 	va_list ap;
 	va_start(ap, s);
-	fprintf(stderr, "%d: error:", yyget_lineno(pp->scaninfo));
+	fprintf(stderr, "line %d:  error: ", yyget_lineno(pp->scaninfo));
 	vfprintf(stderr, s, ap);
 	fprintf(stderr, "\n");
 }

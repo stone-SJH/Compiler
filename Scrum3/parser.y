@@ -56,6 +56,7 @@
 %type <a> prog	stmtlist	stmt	basedec	arrdec	asgnstmt	ifstmt	whilestmt	forstmt	foreachstmt	funcdefinestmt	funccallstmt	explist	exp 
 %type <a> infunclist infunc returnstmt
 %type <a> classdec classdefinestmt	classsucceed
+%type <a> classstmtlist classstmt
 %type <sl> symlist 
 %type  <ag> symbol
 %start prog
@@ -81,6 +82,20 @@ stmt:		basedec	{ $$=$1; }
 		|   classdefinestmt {$$=$1;}
 		|	classsucceed {$$=$1;}
 		;
+classstmtlist:	classstmt 	{ $$=$1; }
+		|	classstmt		classstmtlist	{ $$=newast(pp,'L',$1,$2); }
+		;
+classstmt:		basedec	{ $$=$1; }
+		|	arrdec		{ $$=$1; }
+		|	classdec	{$$=$1;}
+		|	asgnstmt	{ $$=$1; }
+		|	ifstmt		{ $$=$1; }
+		|	forstmt		{ $$=$1; }
+		|	whilestmt	{ $$=$1; }
+		|	foreachstmt	{ $$=$1; }
+		|	funcdefinestmt	{ $$=$1; }
+		|	funccallstmt { $$=$1; }
+		;
 infunclist:	infunc 	{ $$=$1; }
 		|	infunc	infunclist	{ $$=newast(pp,'L',$1,$2); }
 		;
@@ -101,9 +116,9 @@ arrdec:	VAR NAME AS	ARRAY	'['	TYPEINT	']'	OF	TYPE	 ';' {$$=newarr(pp,$2,$9,$6); 
 		;
 classdec: VAR NAME AS NAME ';' {$$=newclass(pp,$2,$4); }
 		;	
-classdefinestmt: CLASS NAME  stmtlist ENDCLASS {$$=newclassdef(pp,$2,NULL,$3);}
+classdefinestmt: CLASS NAME  classstmtlist ENDCLASS {$$=newclassdef(pp,$2,NULL,$3);}
 		;
-classsucceed:	CLASS NAME  EXTENDS NAME   stmtlist ENDCLASS { $$=newclassdef(pp,$2,$4,$5);}
+classsucceed:	CLASS NAME  EXTENDS NAME   classstmtlist ENDCLASS { $$=newclassdef(pp,$2,$4,$5);}
 		;
 asgnstmt:	NAME	'='	exp ';'	{  $$=newasgn(pp,NULL,$1,$3,NULL); }
 		|	NAME	'['	exp ']'	'='	exp	';' { $$=newasgn(pp,NULL,$1,$6,$3); } 
@@ -121,13 +136,14 @@ forstmt:	FOR  '(' NAME FROM TYPEINT TO	TYPEINT STEP	TYPEINT ')'	 stmtlist	ENDFOR
 		;
 foreachstmt:		FOREACH	'(' NAME	YYIN NAME	')' stmtlist ENDFOREACH	{ $$=newforeach(pp,$3,$5,$7); }
 		;
-funcdefinestmt:	LET NAME	'('	symlist	')'	infunclist	ENDFUNC	{ $$=dodef(pp,$2,$4,$6); }
-		|	DEFINE NAME '(' symlist ')' ';'	{ $$=dodef(pp,$2,$4,NULL); }
+funcdefinestmt:	TYPE LET NAME	'('	symlist	')'	infunclist	ENDFUNC	{ $$=dodef(pp,$1,$3,$5,$7); }
+		|	TYPE DEFINE NAME '(' symlist ')' ';'	{ $$=dodef(pp,$1,$3,$5,NULL); }
 		;
 returnstmt: RETURN exp ';' { $$=newast(pp,'R',$2,NULL);}
 		;
 funccallstmt:		FUNC	'('	explist	')' ';'	{$$=newfunc(pp,$1,$3); }
-		|	NAME	'('	explist	')'	 ';' { $$=newcall(pp,$1,$3); }
+		|	NAME	'('	explist	')'	 ';' { $$=newcall(pp,NULL,$1,$3); }
+		|	NAME GET NAME	'('	explist	')'	 ';' { $$=newcall(pp,$1,$3,$5);}
 		;
 symlist:		symbol		{$$=newsymlist(pp,$1,NULL);}
 		|	symbol ','  symlist	{ $$=newsymlist(pp,$1,$3); }
@@ -157,11 +173,12 @@ exp:	exp CMP exp	{ $$=newcmp(pp,$2,$1,$3); }
 		|	TYPEINT	{ $$=newint(pp,$1); }
 		|	NAME	{  $$=newref(pp,$1,NULL); }
 		|	NAME	'['	exp	']'	{ $$=newref(pp,$1,$3); }      
-		|	FUNC	'('	explist	')' 	{$$=newfunc(pp,$1,$3); }
-		|	NAME	'('	explist	')'	  { $$=newcall(pp,$1,$3); }
 		|	NAME	GET	NAME {$$=newcsget(pp,$1,$3,-1,NULL,NULL);}
 		|	NAME	GET  FUNC	'('	explist	')'	{ $$=newcsget(pp,$1,NULL,$3,$5,NULL);}
 		|	NAME	GET NAME	'('	explist	')'	 { $$=newcsget(pp,$1,$3,-1,$5,NULL); }
 		|	NAME	GET	NAME	'['	exp	']'	{ $$=newcsget(pp,$1,$3,-1,NULL,$5); }      
+		|	FUNC	'('	explist	')' 	{$$=newfunc(pp,$1,$3); }
+		|	NAME	'('	explist	')'	  { $$=newcall(pp,NULL,$1,$3); }
+		|	NAME GET NAME	'('	explist	')'	 { $$=newcall(pp,$1,$3,$5);}
 		;
 %%
