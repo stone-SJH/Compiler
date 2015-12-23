@@ -153,8 +153,8 @@ symbol:       { $$=NULL; }
 		|	VAR NAME AS NAME {$$=newarg(pp,$2,-1,$4,-1); }
 		|	VAR NAME AS	ARRAY	'['	TYPEINT	']'	OF	TYPE	 { $$=newarg(pp,$2,$9,NULL,$6); }
 		;
-explist:	
-		|	exp
+explist:		        { $$=NULL; }
+		|	exp		{ $$ =$1;}
 		|	exp ',' explist		{ $$=newast(pp,'L',$1,$3); }
 		;
 exp:	exp CMP exp	{ $$=newcmp(pp,$2,$1,$3); }

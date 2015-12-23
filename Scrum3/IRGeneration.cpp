@@ -1306,7 +1306,8 @@ IRGeneration::getCall(ast* node, int& pos){
 			se->addErrs(err);
 		}
 		int length = ir1.length();
-		ir1 = ir1.substr(0, length - 2);
+		if (paranode != NULL)
+			ir1 = ir1.substr(0, length - 2);
 		ir1 += ")\n\n";
 
 		ir = ir2 + ir1;
@@ -1324,6 +1325,8 @@ IRGeneration::getCall(ast* node, int& pos){
 
 void
 IRGeneration::getCallAss(ast* node, string& ir1, string& ir2, int findex){
+	if (node == NULL)
+		return;
 	if (node->nodetype == 'L'){
 		if (node->l != NULL)
 			getCallAss(node->l, ir1, ir2, findex);

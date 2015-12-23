@@ -16,6 +16,7 @@ while(i<index)
 	then
 		isLeal=0;
 	endif
+	i=i+1;
 endwhile
 isLeal=1;
 return isLeal;

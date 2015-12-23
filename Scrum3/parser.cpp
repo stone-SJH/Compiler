@@ -2039,6 +2039,18 @@ yyreduce:
     { (yyval.ag)=newarg(pp,(yyvsp[(2) - (9)].name),(yyvsp[(9) - (9)].type),NULL,(yyvsp[(6) - (9)].i)); }
     break;
 
+  case 70:
+/* Line 1792 of yacc.c  */
+#line 156 "parser.y"
+    { (yyval.a)=NULL; }
+    break;
+
+  case 71:
+/* Line 1792 of yacc.c  */
+#line 157 "parser.y"
+    { (yyval.a) =(yyvsp[(1) - (1)].a);}
+    break;
+
   case 72:
 /* Line 1792 of yacc.c  */
 #line 158 "parser.y"
@@ -2185,7 +2197,7 @@ yyreduce:
 
 
 /* Line 1792 of yacc.c  */
-#line 2189 "parser.cpp"
+#line 2201 "parser.cpp"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

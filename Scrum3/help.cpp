@@ -470,7 +470,7 @@ struct un eval(struct pcdata*pp, struct ast* a)
 		{
 			struct fndec *fn = (struct fndec*)a;
 			struct symbol* s = lookup(pp, fn->name);
-			if (s != NULL&&s->func != NULL)
+			/*if (s != NULL&&s->func != NULL)
 			{
 				yyerror(pp, "%s  defined repeatly", s->name);
 				exit(0);
@@ -503,8 +503,8 @@ struct un eval(struct pcdata*pp, struct ast* a)
 			s->size = 0;
 			s->charval = 0;
 			s->intval = 0;
-			s->doubval = 0;
-			eval(pp,s->func);
+			s->doubval = 0;*/
+			eval(pp,fn->tl);
 			return r1;
 		}
 		case 8:
