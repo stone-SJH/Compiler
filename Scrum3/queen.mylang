@@ -36,6 +36,7 @@ while(i<size)
 		K[index]=i;
 		index=index+1;
 		eightQueen(K,size,index);
+		index=index-1;
    endif
    i=i+1;
 endwhile

@@ -940,6 +940,7 @@ string
 IRGeneration::getConstant(){
 	string ir;
 	ir = "@_printa = internal constant [5 x i8] c\"%d  \\00\", align 1\n";
+	ir += "@_printn = internal constant [2 x i8] c\"\\0A\\00\", align 1\n";
 	ir += "declare i32 @printf(i8*, ...)\n";
 
 	ir += "\n";

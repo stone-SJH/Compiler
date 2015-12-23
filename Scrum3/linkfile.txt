@@ -25,5 +25,6 @@ entry:
   br label %0
 
 ; <label> : %12
+  call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @_printn, i32 0, i32 0), i32 %8)
   ret void
 }
