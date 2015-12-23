@@ -36,20 +36,29 @@ SemanticError::showErrs(){
 		string et;
 		switch (errlist[i]->errortype)
 		{ 
-		case SYNTAXERR:
-			et = "SYNTAX ERROR";
-			break;
 		case TYPEMISMATCH:
 			et = "TYPE MISMATCH";
 			break;
 		case PARAMISMATCH:
 			et = "PARAMETER MISMATCH";
 			break;
+		case PARANUMERR:
+			et = "PARAMETER NUMBER ERROR";
+			break;
 		case VARUNDECLARE:
 			et = "VARIABLE UNDECLARE";
 			break;
 		case FUNCUNDECLARE:
 			et = "FUNCTION UNDECLARE";
+			break;
+		case VARREDEFINED:
+			et = "VARIABLE REDEFINED";
+			break;
+		case FUNCREDEFINED:
+			et = "FUNCTION REDEFINED";
+			break;
+		case PARAREDEFINED:
+			et = "PARAMETER REDEFINED";
 			break;
 		default:
 			et = "OTHER ERROR";

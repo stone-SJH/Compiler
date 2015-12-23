@@ -2,10 +2,12 @@
 #include "parser.h"
 #include "lexer.h"
 #include "defination.h"
+#include "SemanticError.h"
 using namespace std;
 
 class SymbolTableAnalyse{
 private:
+	SemanticError* se;
 	SymbolTable* st;
 	TypeTable* tt;
 	VariableTable* vt;
@@ -16,9 +18,9 @@ private:
 	void AnalyseMain(ast* node);
 	void AnalyseVariable(ast* node);
 
-	void FuncAnalyseVariable(ast* node, VariableTable* fvt);
-	void FuncAnalyseType(ast* node, TypeTable* ftt);
-	void FuncRead(ast* node, VariableTable* fvt, TypeTable* ftt);
+	void FuncAnalyseVariable(ast* node, VariableTable* fvt, TypeTable* ftt, int index);
+	void FuncAnalyseType(ast* node, VariableTable* fvt, TypeTable* ftt, int index);
+	void FuncRead(ast* node, VariableTable* fvt, TypeTable* ftt, int index);
 	void FuncConstant();//change to get more support system function call
 	void _Analyse(ast* node);
 	
@@ -31,7 +33,8 @@ public:
 	para* checkVariable(string name);
 	para* checkType(string name);
 	func* checkFunc(string name);
+	para* getFuncPara(int funcindex, int paraindex);
 
-	SymbolTableAnalyse();
+	SymbolTableAnalyse(SemanticError* semerr);
 	void Analyse(ast* root);
 };

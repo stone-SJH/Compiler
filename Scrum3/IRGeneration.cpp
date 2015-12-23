@@ -1219,45 +1219,95 @@ IRGeneration::getCall(ast* node){
 	string ir1;
 	string ir2;
 	struct ufncall* ufn = (struct ufncall*)node;
+	int line = node->lineno;
 	string funcname = ufn->name;
-	ast* paranode = ufn->tl;
-	ir1 = "  call void @" + funcname + "(";
-	ir2 = "";
-	getCallAss(paranode, ir1, ir2);
-	int length = ir1.length();
-	ir1 = ir1.substr(0, length - 2);
-	ir1 += ")\n\n";
+	func* f = new func();
+	f = sta->checkFunc(funcname);
+	if (f->name != ""){
+		int findex = f->index;
+		ast* paranode = ufn->tl;
+		ir1 = "  call void @" + funcname + "(";
+		ir2 = "";
+		getCallAss(paranode, ir1, ir2, findex);
+		if (paraindex != f->paranum){
+			serr* err = new serr();
+			err->errortype = PARANUMERR;
+			err->errorpos = line;
+			err->errorinfo = "Call parameter number mismatch with Function parameter number\n";
+			se->addErrs(err);
+		}
+		int length = ir1.length();
+		ir1 = ir1.substr(0, length - 2);
+		ir1 += ")\n\n";
 
-	ir = ir2 + ir1;
+		ir = ir2 + ir1;
+	}
+	else{
+		serr* err = new serr();
+		err->errortype = FUNCUNDECLARE;
+		err->errorpos = node->lineno;
+		err->errorinfo = "Function '" + funcname + "' called without declaration.\n";
+		se->addErrs(err);
+	}
+	paraindex = 0;
 	return ir;
 }
 
 void
-IRGeneration::getCallAss(ast* node, string& ir1, string& ir2){
+IRGeneration::getCallAss(ast* node, string& ir1, string& ir2, int findex){
 	if (node->nodetype == 'L'){
 		if (node->l != NULL)
-			getCallAss(node->l, ir1, ir2);
+			getCallAss(node->l, ir1, ir2, findex);
 		if (node->r != NULL)
-			getCallAss(node->r, ir1, ir2);
+			getCallAss(node->r, ir1, ir2, findex);
 	}
 	else{
 		int pos;
 		int curarrayindex = arrayindex;
 		char c;
 		double d;
+		int line = node->lineno;
 		int r = getCodeAss(node, pos, ir2, c, d);
+		para* p = new para();
+		p = sta->getFuncPara(findex, paraindex);
 		if (r == INT_MAX){
 			if (curarrayindex == arrayindex){
-				ir1 += "i32 %" + getInt(pos) + ", ";
+				if (p->type == "integer")
+					ir1 += "i32 %" + getInt(pos) + ", ";
+				else{
+					serr* err = new serr();
+					err->errortype = PARAMISMATCH;
+					err->errorpos = line;
+					err->errorinfo = "Call parameter mismatch with Function parameter\n";
+					se->addErrs(err);
+				}
 			}
 			else {
-				ir1 += "i32* %" + getInt(pos) + ", ";
-				arrayindex++;
+				if (p->type == "integer" && p->size != -1){
+					ir1 += "i32* %" + getInt(pos) + ", ";
+					arrayindex++;
+				}
+				else{
+					serr* err = new serr();
+					err->errortype = PARAMISMATCH;
+					err->errorpos = line;
+					err->errorinfo = "Call parameter mismatch with Function parameter\n";
+					se->addErrs(err);
+				}
 			}
 		}
 		else {
-			ir1 += "i32 " + getInt(r) + ", ";
+			if (p->type == "integer")
+				ir1 += "i32 " + getInt(r) + ", ";
+			else{
+				serr* err = new serr();
+				err->errortype = PARAMISMATCH;
+				err->errorpos = line;
+				err->errorinfo = "Call parameter mismatch with Function parameter\n";
+				se->addErrs(err);
+			}
 		}
+		paraindex++;
 	}
 }
 
@@ -1287,11 +1337,12 @@ IRGeneration::IRGeneration(ast* rt){
 	whileindex = 0;
 	cmpindex = 0;
 	funcindex = 0;
+	paraindex = 0;
 	root = rt;
 	linkfiles.push_back("linkfile.txt");
-	sta = new SymbolTableAnalyse();
-	sta->Analyse(root);
 	se = new SemanticError();
+	sta = new SymbolTableAnalyse(se);
+	sta->Analyse(root);
 }
 
 void

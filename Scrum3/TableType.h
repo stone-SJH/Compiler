@@ -20,6 +20,8 @@ struct para{
 struct func{
 	string name;
 	int returntype;
+	int paranum;
+	int index;
 };
 //overall
 class SymbolTable{

@@ -25,6 +25,7 @@ private:
 	int whileindex;
 	int cmpindex;
 	int funcindex;
+	int paraindex;
 
 	string getInt(int n);
 	string getFile(string filename);
@@ -51,7 +52,7 @@ private:
 	string getIfCmp(ast* node, bool elseexist, int curifindex, int curelseindex);
 	string getIf(ast* node);
 	string getFunction(ast* node);
-	void getCallAss(ast* node, string& ir1, string& ir2);
+	void getCallAss(ast* node, string& ir1, string& ir2, int findex);
 	string getCall(ast* node);
 public:
 	IRGeneration(ast* root);
