@@ -4,6 +4,7 @@ void
 SymbolTableAnalyse::AnalyseVariable(ast* node){
 	struct var* v = (struct var*) node;
 	string _type, _name;
+	_name = v->name;
 	int size = st->symbolName.size();
 	bool error = false;
 	string retype;
@@ -22,7 +23,6 @@ SymbolTableAnalyse::AnalyseVariable(ast* node){
 		if (v->datatype == 0)
 			_type = "char";
 		//[TODO]class type check 
-		_name = v->name;
 		vt->variableName.push_back(_name);
 		vt->variableType.push_back(_type);
 		st->symbolName.push_back(_name);
@@ -42,6 +42,7 @@ SymbolTableAnalyse::AnalyseType(ast* node){
 	struct arr* a = (struct arr*) node;
 	string _name, _info;
 	int _num;
+	_name = a->name;
 	int size = st->symbolName.size();
 	bool error = false;
 	string retype;
@@ -59,7 +60,6 @@ SymbolTableAnalyse::AnalyseType(ast* node){
 			_info = "double";
 		if (a->datatype == 0)
 			_info = "char";
-		_name = a->name;
 		_num = a->size;
 		tt->typeName.push_back(_name);
 		tt->typeNum.push_back(_num);
