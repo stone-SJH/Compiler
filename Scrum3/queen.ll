@@ -1,35 +1,7 @@
 @_printa = internal constant [5 x i8] c"%d  \00", align 1
+@_printc = internal constant [2 x i8] c"%c", align 1
+@_printn = internal constant [2 x i8] c"\0A\00", align 1
 declare i32 @printf(i8*, ...)
-
-define void @printa(i32* %arr, i32 %n) nounwind {
-entry:
-  %arr.addr = alloca i32*, align 4
-  store i32* %arr, i32** %arr.addr, align 4
-  %n.addr = alloca i32, align 4
-  store i32 %n, i32* %n.addr, align 4
-  %i = alloca i32, align 4
-  store i32 0, i32* %i, align 4
-  br label %0
-
-  %1 = load i32* %i, align 4
-  %2 = load i32* %n.addr, align 4
-  %3 = icmp slt i32 %1, %2
-  br i1 %3, label %4, label %12
-
-; <label> : %4
-  %5 = load i32* %i, align 4
-  %6 = load i32** %arr.addr, align 4
-  %7 = getelementptr inbounds i32* %6, i32 %5
-  %8 = load i32* %7, align 4
-  call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @_printa, i32 0, i32 0), i32 %8)
-  %10 = load i32* %i, align 4
-  %11 = add nsw i32 %10, 1
-  store i32 %11, i32* %i, align 4
-  br label %0
-
-; <label> : %12
-  ret void
-}
 
 define i32 @isLegal(i32* %K, i32 %size, i32 %index, i32 %pos) {
   %K.var = alloca i32*, align 8
@@ -43,7 +15,7 @@ define i32 @isLegal(i32* %K, i32 %size, i32 %index, i32 %pos) {
   %i = alloca i32, align 4
   %isLeal = alloca i32, align 4
   store i32 0, i32* %i
-  store i32 0, i32* %isLeal
+  store i32 1, i32* %isLeal
   br label %1
 
 ; <label>:1
@@ -103,12 +75,14 @@ ifend1:
   br label %ifend2
 
 ifend2:
+  %38 = load i32* %i
+  %39 = add nsw i32 %38, 1
+  store i32 %39, i32* %i
   br label %1
 
 whileend0:
-  store i32 1, i32* %isLeal
-  %38 = load i32* %isLeal
-  ret i32 %38
+  %40 = load i32* %isLeal
+  ret i32 %40
 }
 
 define void @eightQueen(i32* %K, i32 %size, i32 %index) {
@@ -163,21 +137,24 @@ define void @eightQueen(i32* %K, i32 %size, i32 %index) {
   %27 = load i32* %index.var
   call void @eightQueen(i32* %25, i32 %26, i32 %27)
 
+  %28 = load i32* %index.var
+  %29 = sub nsw i32 %28, 1
+  store i32 %29, i32* %index.var
   br label %ifend4
 
 ifend4:
-  %28 = load i32* %i
-  %29 = add nsw i32 %28, 1
-  store i32 %29, i32* %i
+  %30 = load i32* %i
+  %31 = add nsw i32 %30, 1
+  store i32 %31, i32* %i
   br label %5
 
 whileend1:
   br label %ifend3
 
 else0:
-  %30 = load i32** %K.var
-  %31 = load i32* %size.var
-  call void @printa(i32* %30, i32 %31)
+  %32 = load i32** %K.var
+  %33 = load i32* %size.var
+  call void @printa(i32* %32, i32 %33)
 
   br label %ifend3
 
@@ -215,6 +192,70 @@ define i32 @main() {
   call void @eightQueen(i32* %17, i32 8, i32 0)
 
   ret i32 0
+}
+
+
+;link
+define void @printa(i32* %arr, i32 %n) nounwind {
+entry:
+  %arr.var = alloca i32*, align 4
+  store i32* %arr, i32** %arr.var, align 4
+  %n.var = alloca i32, align 4
+  store i32 %n, i32* %n.var, align 4
+  %i = alloca i32, align 4
+  store i32 0, i32* %i, align 4
+  br label %0
+
+  %1 = load i32* %i, align 4
+  %2 = load i32* %n.var, align 4
+  %3 = icmp slt i32 %1, %2
+  br i1 %3, label %4, label %12
+
+; <label> : %4
+  %5 = load i32* %i, align 4
+  %6 = load i32** %arr.var, align 4
+  %7 = getelementptr inbounds i32* %6, i32 %5
+  %8 = load i32* %7, align 4
+  call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @_printa, i32 0, i32 0), i32 %8)
+  %10 = load i32* %i, align 4
+  %11 = add nsw i32 %10, 1
+  store i32 %11, i32* %i, align 4
+  br label %0
+
+; <label> : %12
+  call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @_printn, i32 0, i32 0), i32 %8)
+  ret void
+}
+
+define void @printc(i8* %arr, i32 %n) nounwind {
+entry:
+  %arr.var = alloca i8*, align 1
+  store i8* %arr, i8** %arr.var, align 1
+  %n.var = alloca i32, align 4
+  store i32 %n, i32* %n.var, align 4
+  %i = alloca i32, align 4
+  store i32 0, i32* %i, align 4
+  br label %0
+
+  %1 = load i32* %i, align 4
+  %2 = load i32* %n.var, align 4
+  %3 = icmp slt i32 %1, %2
+  br i1 %3, label %4, label %12
+
+; <label> : %4
+  %5 = load i32* %i, align 4
+  %6 = load i8** %arr.var, align 1
+  %7 = getelementptr inbounds i8* %6, i32 %5
+  %8 = load i8* %7
+  call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @_printc, i32 0, i32 0), i8 %8)
+  %10 = load i32* %i, align 4
+  %11 = add nsw i32 %10, 1
+  store i32 %11, i32* %i, align 4
+  br label %0
+
+; <label> : %12
+  call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @_printn, i32 0, i32 0), i8 %8)
+  ret void
 }
 
 

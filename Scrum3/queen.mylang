@@ -2,7 +2,7 @@ int let isLegal(var K as array[8] of int,var size as int,var index as int,var po
 var i as int;
 var isLeal as int;
 i=0;
-isLeal=0;
+isLeal=1;
 while(i<index)
 	if(K[i]==pos)
 	then
@@ -18,7 +18,6 @@ while(i<index)
 	endif
 	i=i+1;
 endwhile
-isLeal=1;
 return isLeal;
 endfunc
 

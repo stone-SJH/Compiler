@@ -16,8 +16,8 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 	case 2:
 	{
 		struct charcons* cc = (struct charcons*)node;
-		int ret = (int)(cc->ch);
-		return ret;
+		ch = cc->ch;
+		return INT_MAX;
 	}
 	case 3:
 	{
@@ -294,19 +294,38 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 					}
 				}
 				if (typecode == 0){
-					int r = INT_MAX;
-					char c;
-					double d;
-					r = getCodeAss(sa->v, index0, ir, c, d);
-					if (r != INT_MAX){
-						string ir1 = "  store i32 " + getInt(r) + ", i32* %" + varname + "\n";
-						ir += ir1;
-						return INT_MAX;
+					if (p->type == "integer"){
+						int r = INT_MAX;
+						char c;
+						double d;
+						r = getCodeAss(sa->v, index0, ir, c, d);
+						if (r != INT_MAX){
+							string ir1 = "  store i32 " + getInt(r) + ", i32* %" + varname + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else{
+							string ir1 = "  store i32 %" + getInt(index0) + ", i32* %" + varname + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
 					}
-					else{
-						string ir1 = "  store i32 %" + getInt(index0) + ", i32* %" + varname + "\n";
-						ir += ir1;
-						return INT_MAX;
+					else if (p->type == "char"){
+						int r = INT_MAX;
+						char c = 0;
+						double d;
+						r = getCodeAss(sa->v, index0, ir, c, d);
+						if (c == 0){
+							string ir1 = "  store i8 %" + getInt(index0) + ", i8* %" + varname + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else{
+							string ir1 = "  store i8 " + getInt((int)c) + ", i8* %" + varname + "\n";
+							ir += ir1;
+							ch = 0;
+							return INT_MAX;
+						}
 					}
 				}
 				else {
@@ -321,19 +340,38 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 			else{
 				para* p = sta->checkVariable(varname);
 				if (p->name != ""){
-					int r = INT_MAX;
-					char c;
-					double d;
-					r = getCodeAss(sa->v, index0, ir, c, d);
-					if (r != INT_MAX){
-						string ir1 = "  store i32 " + getInt(r) + ", i32* %" + varname + "\n";
-						ir += ir1;
-						return INT_MAX;
+					if (p->type == "integer"){
+						int r = INT_MAX;
+						char c;
+						double d;
+						r = getCodeAss(sa->v, index0, ir, c, d);
+						if (r != INT_MAX){
+							string ir1 = "  store i32 " + getInt(r) + ", i32* %" + varname + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else{
+							string ir1 = "  store i32 %" + getInt(index0) + ", i32* %" + varname + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
 					}
-					else{
-						string ir1 = "  store i32 %" + getInt(index0) + ", i32* %" + varname + "\n";
-						ir += ir1;
-						return INT_MAX;
+					else if (p->type == "char"){
+						int r = INT_MAX;
+						char c = 0;
+						double d;
+						r = getCodeAss(sa->v, index0, ir, c, d);
+						if (c == 0){
+							string ir1 = "  store i8 %" + getInt(index0) + ", i8* %" + varname + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else{
+							string ir1 = "  store i8 " + getInt((int)ch) + ", i8* %" + varname + "\n";
+							ir += ir1;
+							ch = 0;
+							return INT_MAX;
+						}
 					}
 				}
 				else{
@@ -357,47 +395,45 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 				else {
 					p = sta->checkFuncType(varname, funcindex);
 					if (p->name != ""){
-						typecode = 0;
+						typecode = -1;
 					}
 				}
 				if (typecode == 0){
-					string ir1;
-					int r = INT_MAX;
-					char c1;
-					double d1;
-					r = getCodeAss(indexnode, index0, ir1, c1, d1);
-					int curindex = index0;
-					int rr = INT_MAX;
-					char c2;
-					double d2;
-					rr = getCodeAss(sa->v, index0, ir1, c2, d2);
-					int curindexx = index0;
-					if (r != INT_MAX && rr != INT_MAX){
-						int curindex = index;
-						//ir1 += getLoadIntPointer(varname);
-						ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i32]* %" + varname + ", i32 0, i32 0\n";
-						index++;
-						ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
-						index0 = index;
-						index++;
-						ir1 += "  store i32 " + getInt(rr) + ", i32* %" + getInt(index0) + "\n";
-						ir += ir1;
-						return INT_MAX;
-					}
-					else if (r != INT_MAX && rr == INT_MAX){
-						int curindex = index;
-						ir1 += getLoadIntPointer(varname);
-						ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
-						index0 = index;
-						index++;
-						ir1 += "  store i32 %" + getInt(curindexx) + ", i32* %" + getInt(index0) + "\n";
-						ir += ir1;
-						return INT_MAX;
-					}
-					else if (r == INT_MAX && rr != INT_MAX){
-						int curindex0 = index0;
-						int curindex1 = index;
-						if (p->type == "integer"){
+					if (p->type == "integer"){
+						string ir1;
+						int r = INT_MAX;
+						char c1;
+						double d1;
+						r = getCodeAss(indexnode, index0, ir1, c1, d1);
+						int curindex = index0;
+						int rr = INT_MAX;
+						char c2;
+						double d2;
+						rr = getCodeAss(sa->v, index0, ir1, c2, d2);
+						int curindexx = index0;
+						if (r != INT_MAX && rr != INT_MAX){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 " + getInt(rr) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r != INT_MAX && rr == INT_MAX){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 %" + getInt(curindexx) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && rr != INT_MAX){
+							int curindex0 = index0;
+							int curindex1 = index;
 							ir1 += getLoadIntPointer(varname);
 							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex0) + " to i64\n";
 							curindex0 = index;
@@ -410,16 +446,9 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							ir += ir1;
 							return INT_MAX;
 						}
-						else if (p->type == "char"){
-							ir1 += getLoadCharPointer(varname);
-							//[TODO]
-							return INT_MAX;
-						}
-					}
-					else if (r == INT_MAX && rr == INT_MAX){
-						int curindex0 = index0;
-						int curindex1 = index;
-						if (p->type == "integer"){
+						else if (r == INT_MAX && rr == INT_MAX){
+							int curindex0 = index0;
+							int curindex1 = index;
 							ir1 += getLoadIntPointer(varname);
 							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex) + " to i64\n";
 							curindex0 = index;
@@ -431,9 +460,185 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							ir += ir1;
 							return INT_MAX;
 						}
-						else if (p->type == "char"){
-							ir1 += getLoadCharPointer(varname);
-							//[TODO]
+					}
+					else if (p->type == "char"){
+						string ir1;
+						int r = INT_MAX;
+						char c1 = 0;
+						double d1;
+						r = getCodeAss(indexnode, index0, ir1, c1, d1);
+						int curindex = index0;
+						int rr = INT_MAX;
+						char c2 = 0;
+						double d2;
+						rr = getCodeAss(sa->v, index0, ir1, c2, d2);
+						int curindexx = index0;
+						if (r != INT_MAX && c2 != 0){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 " + getInt((int)c2) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r != INT_MAX && c2 == 0){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 %" + getInt(curindexx) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && c2 != 0){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex0) + " to i64\n";
+							curindex0 = index;
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex1) + " , i64 %" + getInt(curindex0) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 " + getInt((int)ch) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && c2 == 0){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex) + " to i64\n";
+							curindex0 = index;
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex1) + " , i64 %" + getInt(curindex0) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 %" + getInt(curindexx) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+					}
+				}
+				else if (typecode == -1){
+					if (p->type == "integer"){
+						string ir1;
+						int r = INT_MAX;
+						char c1;
+						double d1;
+						r = getCodeAss(indexnode, index0, ir1, c1, d1);
+						int curindex = index0;
+						int rr = INT_MAX;
+						char c2;
+						double d2;
+						rr = getCodeAss(sa->v, index0, ir1, c2, d2);
+						int curindexx = index0;
+						if (r != INT_MAX && rr != INT_MAX){
+							int curindex = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i32]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 " + getInt(rr) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r != INT_MAX && rr == INT_MAX){
+							int curindex = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i32]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 %" + getInt(curindexx) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && rr != INT_MAX){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i32]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 " + getInt(rr) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && rr == INT_MAX){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i32]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 %" + getInt(curindexx) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+					}
+					else if (p->type == "char"){
+						string ir1;
+						int r = INT_MAX;
+						char c1 = 0;
+						double d1;
+						r = getCodeAss(indexnode, index0, ir1, c1, d1);
+						int curindex = index0;
+						int rr = INT_MAX;
+						char c2 = 0;
+						double d2;
+						rr = getCodeAss(sa->v, index0, ir1, c2, d2);
+						int curindexx = index0;
+						if (r != INT_MAX && c2 != 0){
+							int curindex = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i8]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 " + getInt((int)c2) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r != INT_MAX && c2 == 0){
+							int curindex = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i8]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 %" + getInt(curindexx) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && c2 != 0){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i8]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 " + getInt((int)c2) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && c2 == 0){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) + " x i8]* %" + varname + ", i32 0, i32 0\n";
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 %" + getInt(curindexx) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
 							return INT_MAX;
 						}
 					}
@@ -450,43 +655,41 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 			else{
 				para* p = sta->checkType(varname);
 				if (p->name != ""){
-					string ir1;
-					int r = INT_MAX;
-					char c1;
-					double d1;
-					r = getCodeAss(indexnode, index0, ir1, c1, d1);
-					int curindex = index0;
-					int rr = INT_MAX;
-					char c2;
-					double d2;
-					rr = getCodeAss(sa->v, index0, ir1, c2, d2);
-					int curindexx = index0;
-					if (r != INT_MAX && rr != INT_MAX){
-						int curindex = index;
-						//ir1 += getLoadIntPointer(varname);
-						ir1 += "  %" + getInt(index) + " = getelementptr inbounds[" + getInt(p->size) +  " x i32]* %" + varname + ", i32 0, i32 0\n";
-						index++;
-						ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(index - 1) + ", i64 " + getInt(r) + "\n";
-						index0 = index;
-						index++;
-						ir1 += "  store i32 " + getInt(rr) + ", i32* %" + getInt(index0) + "\n";
-						ir += ir1;
-						return INT_MAX;
-					}
-					else if (r != INT_MAX && rr == INT_MAX){
-						int curindex = index;
-						ir1 += getLoadIntPointer(varname);
-						ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(curindex) + ", i64 " + getInt(r) + "\n";
-						index0 = index;
-						index++;
-						ir1 += "  store i32 %" + getInt(curindexx) + ", i32* %" + getInt(index0) + "\n";
-						ir += ir1;
-						return INT_MAX;
-					}
-					else if (r == INT_MAX && rr != INT_MAX){
-						int curindex0 = index0;
-						int curindex1 = index;
-						if (p->type == "integer"){
+					if (p->type == "integer"){
+						string ir1;
+						int r = INT_MAX;
+						char c1;
+						double d1;
+						r = getCodeAss(indexnode, index0, ir1, c1, d1);
+						int curindex = index0;
+						int rr = INT_MAX;
+						char c2;
+						double d2;
+						rr = getCodeAss(sa->v, index0, ir1, c2, d2);
+						int curindexx = index0;
+						if (r != INT_MAX && rr != INT_MAX){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 " + getInt(rr) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r != INT_MAX && rr == INT_MAX){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i32* %" + getInt(curindex) + ", i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i32 %" + getInt(curindexx) + ", i32* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && rr != INT_MAX){
+							int curindex0 = index0;
+							int curindex1 = index;
 							ir1 += getLoadIntPointer(varname);
 							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex0) + " to i64\n";
 							curindex0 = index;
@@ -499,16 +702,9 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							ir += ir1;
 							return INT_MAX;
 						}
-						else if (p->type == "char"){
-							ir1 += getLoadCharPointer(varname);
-							//[TODO]
-							return INT_MAX;
-						}
-					}
-					else if (r == INT_MAX && rr == INT_MAX){
-						int curindex0 = index0;
-						int curindex1 = index;
-						if (p->type == "integer"){
+						else if (r == INT_MAX && rr == INT_MAX){
+							int curindex0 = index0;
+							int curindex1 = index;
 							ir1 += getLoadIntPointer(varname);
 							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex) + " to i64\n";
 							curindex0 = index;
@@ -520,9 +716,65 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							ir += ir1;
 							return INT_MAX;
 						}
-						else if (p->type == "char"){
-							ir1 += getLoadCharPointer(varname);
-							//[TODO]
+					}
+					else if (p->type == "char"){
+						string ir1;
+						int r = INT_MAX;
+						char c1 = 0;
+						double d1;
+						r = getCodeAss(indexnode, index0, ir1, c1, d1);
+						int curindex = index0;
+						int rr = INT_MAX;
+						char c2 = 0;
+						double d2;
+						rr = getCodeAss(sa->v, index0, ir1, c2, d2);
+						int curindexx = index0;
+						if (r != INT_MAX && c2 != 0){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 " + getInt((int)c2) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r != INT_MAX && c2 == 0){
+							int curindex = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex) + " , i64 " + getInt(r) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 %" + getInt(curindexx) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && c2 != 0){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex0) + " to i64\n";
+							curindex0 = index;
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex1) + " , i64 %" + getInt(curindex0) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 " + getInt((int)ch) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
+							return INT_MAX;
+						}
+						else if (r == INT_MAX && c2 == 0){
+							int curindex0 = index0;
+							int curindex1 = index;
+							ir1 += getLoadIntPointer(varname);
+							ir1 += "  %" + getInt(index) + " = sext i32 %" + getInt(curindex) + " to i64\n";
+							curindex0 = index;
+							index++;
+							ir1 += "  %" + getInt(index) + " = getelementptr inbounds i8* %" + getInt(curindex1) + " , i64 %" + getInt(curindex0) + "\n";
+							index0 = index;
+							index++;
+							ir1 += "  store i8 %" + getInt(curindexx) + ", i8* %" + getInt(index0) + "\n";
+							ir += ir1;
 							return INT_MAX;
 						}
 					}
@@ -940,6 +1192,7 @@ string
 IRGeneration::getConstant(){
 	string ir;
 	ir = "@_printa = internal constant [5 x i8] c\"%d  \\00\", align 1\n";
+	ir += "@_printc = internal constant [2 x i8] c\"%c\", align 1\n";
 	ir += "@_printn = internal constant [2 x i8] c\"\\0A\\00\", align 1\n";
 	ir += "declare i32 @printf(i8*, ...)\n";
 
@@ -1337,7 +1590,7 @@ IRGeneration::getCallAss(ast* node, string& ir1, string& ir2, int findex){
 	else{
 		int pos;
 		int curarrayindex = arrayindex;
-		char c;
+		char c = 0;
 		double d;
 		int line = node->lineno;
 		int r = getCodeAss(node, pos, ir2, c, d);
@@ -1347,6 +1600,8 @@ IRGeneration::getCallAss(ast* node, string& ir1, string& ir2, int findex){
 			if (curarrayindex == arrayindex){
 				if (p->type == "integer")
 					ir1 += "i32 %" + getInt(pos) + ", ";
+				else if (p->type == "char")
+					ir1 += "i8 %" + getInt(pos) + ", ";
 				else{
 					serr* err = new serr();
 					err->errortype = PARAMISMATCH;
@@ -1358,6 +1613,10 @@ IRGeneration::getCallAss(ast* node, string& ir1, string& ir2, int findex){
 			else {
 				if (p->type == "integer" && p->size != -1){
 					ir1 += "i32* %" + getInt(pos) + ", ";
+					arrayindex++;
+				}
+				else if (p->type == "char" && p->size != -1){
+					ir1 += "i8* %" + getInt(pos) + ", ";
 					arrayindex++;
 				}
 				else{
@@ -1372,6 +1631,9 @@ IRGeneration::getCallAss(ast* node, string& ir1, string& ir2, int findex){
 		else {
 			if (p->type == "integer")
 				ir1 += "i32 " + getInt(r) + ", ";
+			else if (p->type == "char"){
+				ir1 += "i8 " + getInt((int)c) + ", ";
+			}
 			else{
 				serr* err = new serr();
 				err->errortype = PARAMISMATCH;
@@ -1389,15 +1651,20 @@ IRGeneration::Generate(){
 	string ir;
 	string ir1 = "";
 	ir += getConstant();
-	ir += getLinkFunc();
+	
 	int pos;
 	char c;
 	double d;
 	int r = getCodeAss(root, pos, ir1, c, d);
+
 	if (se->checkErrs())
 		ir = se->showErrs();
-	else
+	else{
 		ir += ir1;
+		ir += "\n";
+		ir += ";link\n";
+		ir += getLinkFunc();
+	}
 	return ir;
 }
 

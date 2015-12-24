@@ -306,13 +306,13 @@ SymbolTableAnalyse::AnalyseFunction(ast* node){
 
 void
 SymbolTableAnalyse::FuncConstant(){
+	/*printa*/
 	string _name;
 	int _return_type;
 	int _para_num;
 	vector<string> _para_name;
 	vector<int> _para_size;
 	vector<string> _para_type;
-	/*printa*/
 	_name = "printa";
 	_return_type = 0;
 	_para_num = 2;
@@ -330,8 +330,31 @@ SymbolTableAnalyse::FuncConstant(){
 	ft->functionParaName.push_back(_para_name);
 	ft->functionParaSize.push_back(_para_size);
 	ft->functionParaType.push_back(_para_type);
-	/*...*/
-
+	/*printc*/
+	string _name0;
+	int _return_type0;
+	int _para_num0;
+	vector<string> _para_name0;
+	vector<int> _para_size0;
+	vector<string> _para_type0;
+	_name0 = "printc";
+	_return_type0 = 0;
+	_para_num0 = 2;
+	_para_name0.push_back("arr");
+	_para_name0.push_back("n");
+	_para_size0.push_back(10000);
+	_para_size0.push_back(-1);
+	_para_type0.push_back("char");
+	_para_type0.push_back("integer");
+	ft->functionName.push_back(_name0);
+	ft->functionReturn.push_back(_return_type0);
+	st->symbolName.push_back(_name0);
+	st->symbolType.push_back(FUNCTION);
+	ft->functionParaNum.push_back(_para_num0);
+	ft->functionParaName.push_back(_para_name0);
+	ft->functionParaSize.push_back(_para_size0);
+	ft->functionParaType.push_back(_para_type0);
+	/*.....*/
 }
 
 void 
