@@ -16,3 +16,7 @@ Team @HuangZhiqiang @ChenJianan @stone-SJH
 2015/12/22  完成快排、八皇后的IR生成及正常运行
 
 2015/12/23  添加char类型相关，完成helloworld的IR生成及正常运行
+
+2015/12/26  添加类相关，完成图形化输入输出界面
+
+2015/12/27  添加两个新demo@reference Leetcode no.26&no.27
