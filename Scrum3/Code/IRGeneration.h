@@ -55,6 +55,20 @@ private:
 	string getFunction(ast* node);
 	void getCallAss(ast* node, string& ir1, string& ir2, int findex);
 	string getCall(ast* node, int& pos);
+
+	/* Chen Jianan added these functions*/
+	// 创建class实例指针
+	string getAllocaClass(string cname, string vname);
+	// 构造Class定义的IR
+	string getClass(ast* node);
+	// 获取成员变量
+	string getClassMember(string membername);
+	// 获取类实例指针
+	string getClassPointer();
+	// 获得下标（类作为一个聚合类型，通过下标可以访问该位置的成员）
+	string getMemberIndex(string membername);
+	/* End*/
+
 public:
 	IRGeneration(ast* root);
 	void AddLinkFile(string filename);

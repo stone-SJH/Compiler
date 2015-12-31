@@ -27,7 +27,7 @@ EXP ([Ee][-+]?[0-9]+)
 "%"	|
 "~"	|
 "&"	|
-"|"		|
+"|"	|
 "="	|
 "|"	|
 ","		|
@@ -35,57 +35,57 @@ EXP ([Ee][-+]?[0-9]+)
 "("	|
 ")"	|
 "["	|
-"]"	{	return yytext[0];	}
+"]"	{pp->tokens+=yytext[0]; return yytext[0];	}
 
-">" { yylval->fn=1; return CMP; }
-"<" { yylval->fn=2; return CMP; }
-"<>" { yylval->fn=3; return CMP; }
-"==" { yylval->fn=4; return CMP; }
-">=" { yylval->fn=5; return CMP; }
-"<=" { yylval->fn=6; return CMP; }
-"->"  { return GET; }
+">" {pp->tokens+=yytext; yylval->fn=1; return CMP; }
+"<" { pp->tokens+=yytext;yylval->fn=2; return CMP; }
+"<>" { pp->tokens+=yytext;yylval->fn=3; return CMP; }
+"==" {pp->tokens+=yytext; yylval->fn=4; return CMP; }
+">=" { pp->tokens+=yytext;yylval->fn=5; return CMP; }
+"<=" {pp->tokens+=yytext; yylval->fn=6; return CMP; }
+"->"  { pp->tokens+=yytext;return GET; }
 
-"if"	{ return IF; }
-"then"	{ return THEN; }
-"else"	{ return ELSE; }
-"endif"	{ return ENDIF;}
-"while"	{ return WHILE; }
-"endwhile"	{ return ENDWHILE; }
-"for"		{ return FOR; }
-"from"	{ return FROM; }
-"to"	{ return TO; }
-"step"	{ return STEP; }
-"endfor"	{ return ENDFOR; }
-"foreach"	{ return FOREACH; }
-"in"	{ return YYIN;}
-"endforeach" { return ENDFOREACH; }
-"let"	{ return LET; }
-"define" { return DEFINE;}
-"endfunc"	{ return ENDFUNC; }
-"return"	{ return RETURN; }
-"class"	{ return CLASS;}
-"extends" { return EXTENDS;}
-"endclass" { return ENDCLASS;}
+"if"	{ pp->tokens+=yytext;return IF; }
+"then"	{ pp->tokens+=yytext;return THEN; }
+"else"	{ pp->tokens+=yytext;return ELSE; }
+"endif"	{pp->tokens+=yytext; return ENDIF;}
+"while"	{pp->tokens+=yytext; return WHILE; }
+"endwhile"	{pp->tokens+=yytext; return ENDWHILE; }
+"for"		{ pp->tokens+=yytext;return FOR; }
+"from"	{ pp->tokens+=yytext;return FROM; }
+"to"	{ pp->tokens+=yytext;return TO; }
+"step"	{pp->tokens+=yytext; return STEP; }
+"endfor"	{ pp->tokens+=yytext;return ENDFOR; }
+"foreach"	{ pp->tokens+=yytext;return FOREACH; }
+"in"	{ pp->tokens+=yytext;return YYIN;}
+"endforeach" { pp->tokens+=yytext;return ENDFOREACH; }
+"let"	{ pp->tokens+=yytext;return LET; }
+"define" { pp->tokens+=yytext;return DEFINE;}
+"endfunc"	{pp->tokens+=yytext; return ENDFUNC; }
+"return"	{ pp->tokens+=yytext;return RETURN; }
+"class"	{ pp->tokens+=yytext;return CLASS;}
+"extends" {pp->tokens+=yytext; return EXTENDS;}
+"endclass" { pp->tokens+=yytext;return ENDCLASS;}
 
-"var"		{ return VAR;}
-"as"		{ return AS;}
-"of"		{ return OF;}
-"char"	{ yylval->type=0; return TYPE;  }
-"int"	{ yylval->type = 1; return TYPE; }
-"double"	{ yylval->type = 2; return TYPE; }
-"void" { yylval->type = -1; return TYPE; }
-"array"	{ return ARRAY; }
+"var"		{ pp->tokens+=yytext;return VAR;}
+"as"		{ pp->tokens+=yytext;return AS;}
+"of"		{ pp->tokens+=yytext;return OF;}
+"char"	{ pp->tokens+=yytext;yylval->type=0; return TYPE;  }
+"int"	{ pp->tokens+=yytext;yylval->type = 1; return TYPE; }
+"double"	{pp->tokens+=yytext; yylval->type = 2; return TYPE; }
+"void" { pp->tokens+=yytext;yylval->type = -1; return TYPE; }
+"array"	{ pp->tokens+=yytext;return ARRAY; }
 
-"sqrt"	{ yylval->fn=B_sqrt; return FUNC; }
-"exp"	{ yylval->fn=B_exp; return FUNC; }
-"log"		{ yylval->fn=B_log; return FUNC; }
-"print" { yylval->fn=B_print; return FUNC; }
+"sqrt"	{ pp->tokens+=yytext;yylval->fn=B_sqrt; return FUNC; }
+"exp"	{pp->tokens+=yytext; yylval->fn=B_exp; return FUNC; }
+"log"		{pp->tokens+=yytext; yylval->fn=B_log; return FUNC; }
+"print" { pp->tokens+=yytext;yylval->fn=B_print; return FUNC; }
 
-[\'|\"][^ \n\r][\'|\"]	{ yylval->c=yytext[1]; return TYPECHAR; }
-[0-9]+{EXP}?		{ yylval->i=atoi(yytext);return TYPEINT; }
-[0-9]+"."[0-9]*{EXP}? { yylval->d=atof(yytext); return TYPEDOUBLE; }
+[\'|\"][^ \n\r][\'|\"]	{ pp->tokens+=yytext;yylval->c=yytext[1]; return TYPECHAR; }
+[0-9]+{EXP}?		{pp->tokens+=yytext; yylval->i=atoi(yytext);return TYPEINT; }
+[0-9]+"."[0-9]*{EXP}? { pp->tokens+=yytext;yylval->d=atof(yytext); return TYPEDOUBLE; }
 
-[_a-zA-Z][_a-zA-Z0-9]* { char* t=new char[strlen(yytext)+1];
+[_a-zA-Z][_a-zA-Z0-9]* {pp->tokens+=yytext; char* t=new char[strlen(yytext)+1];
 									strcpy_s(t,strlen(yytext)+1,yytext) ;
 									yylval->name=t;
 									return NAME; }
@@ -93,7 +93,7 @@ EXP ([Ee][-+]?[0-9]+)
 "//".*
 [ \t]
 \\n	
-"\n" 
+"\n" {pp->tokens+=yytext;}
 
 .	{ yyerror(pp,"invalid character %s\n",yytext); }
 <<EOF>>	{ return FILEEND; }

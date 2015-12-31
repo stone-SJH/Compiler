@@ -1,6 +1,7 @@
+#include "stdafx.h"
 #include"SymbolTableAnalyse.h"
 
-void 
+void
 SymbolTableAnalyse::AnalyseVariable(ast* node){
 	struct var* v = (struct var*) node;
 	string _type, _name;
@@ -22,7 +23,7 @@ SymbolTableAnalyse::AnalyseVariable(ast* node){
 			_type = "double";
 		if (v->datatype == 0)
 			_type = "char";
-		//[TODO]class type check 
+		
 		vt->variableName.push_back(_name);
 		vt->variableType.push_back(_type);
 		st->symbolName.push_back(_name);
@@ -37,7 +38,63 @@ SymbolTableAnalyse::AnalyseVariable(ast* node){
 	}
 	return;
 }
-void 
+//分析class变量的声明，比如 var a as b，b是class
+void
+SymbolTableAnalyse::AnalyseClassDec(ast* node)
+{
+	struct csdec* v = (struct csdec*)node;
+	string _type, _name,_cname;
+	_name = v->vname;
+	_cname = v->cname;
+	int size = st->symbolName.size();
+	bool error = false;
+	string retype;
+	for (int i = 0; i < size; i++){
+		if (st->symbolName[i] == _name){
+			error = true;
+			retype = st->symbolType[i];
+			break;
+		}
+	}
+	if (error)
+	{
+		serr* err = new serr();
+		err->errortype = VARREDEFINED;
+		err->errorpos = node->lineno;
+		err->errorinfo = "Variable '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
+		se->addErrs(err);
+	}
+	else
+	{
+		error = true;
+		string retype;
+		for (int i = 0; i < size; i++){
+			if (st->symbolName[i] == _cname){
+				error = false;
+				retype = st->symbolType[i];
+				break;
+			}
+		}
+		if (!error)
+		{
+			_type=v->cname;
+			vt->variableName.push_back(_name);
+			vt->variableType.push_back(_type);
+			st->symbolName.push_back(_name);
+			st->symbolType.push_back(VARIABLE);
+		}
+		else
+		{
+			serr* err = new serr();
+			err->errortype = VARUNDECLARE;
+			err->errorpos = node->lineno;
+			err->errorinfo = "Class '" + _cname + "' undefined with " + retype + " '" + _cname + "'\n";
+			se->addErrs(err);
+		}
+	}
+	return;
+}
+void
 SymbolTableAnalyse::AnalyseType(ast* node){
 	struct arr* a = (struct arr*) node;
 	string _name, _info;
@@ -60,6 +117,7 @@ SymbolTableAnalyse::AnalyseType(ast* node){
 			_info = "double";
 		if (a->datatype == 0)
 			_info = "char";
+		
 		_num = a->size;
 		tt->typeName.push_back(_name);
 		tt->typeNum.push_back(_num);
@@ -77,10 +135,10 @@ SymbolTableAnalyse::AnalyseType(ast* node){
 	return;
 }
 
-void 
+void
 SymbolTableAnalyse::FuncAnalyseVariable(ast*node, VariableTable* fvt, TypeTable* ftt, int index){
 	struct var* v = (struct var*) node;
-	string _type, _name; 
+	string _type, _name;
 	bool error = false;
 	string retype;
 	int size;
@@ -127,8 +185,7 @@ SymbolTableAnalyse::FuncAnalyseVariable(ast*node, VariableTable* fvt, TypeTable*
 			_type = "double";
 		if (v->datatype == 0)
 			_type = "char";
-		//[TODO]class type check 
-
+		
 		fvt->variableName.push_back(_name);
 		fvt->variableType.push_back(_type);
 	}
@@ -138,6 +195,87 @@ SymbolTableAnalyse::FuncAnalyseVariable(ast*node, VariableTable* fvt, TypeTable*
 		err->errorpos = node->lineno;
 		err->errorinfo = "Variable '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
 		se->addErrs(err);
+	}
+	return;
+}
+
+void
+SymbolTableAnalyse::FuncAnalyseClassDec(ast*node, VariableTable* fvt, TypeTable* ftt, int index){
+	struct csdec* v = (struct csdec*) node;
+	string _type, _name;
+	bool error = false;
+	string retype;
+	int size;
+	_name = v->vname;
+	size = fvt->variableName.size();
+	for (int i = 0; i < size; i++){
+		if (fvt->variableName[i] == _name){
+			error = true;
+			retype = "VARIABLE";
+			break;
+		}
+	}
+	if (!error){
+		size = ftt->typeName.size();
+		for (int i = 0; i < size; i++){
+			if (ftt->typeName[i] == _name){
+				error = true;
+				retype = "ATYPE";
+				break;
+			}
+		}
+		if (!error){
+			size = ft->functionParaName[index].size();
+			for (int i = 0; i < size; i++){
+				if (ft->functionParaName[index][i] == _name){
+					error = true;
+					retype = "PARAMETER";
+					break;
+				}
+			}
+			if (!error){
+				if (ft->functionName[index] == _name){
+					error = true;
+					retype = "FUNCTION";
+				}
+			}
+		}
+		if (!error)
+		{
+			error = true;
+			size = ct->className.size();
+			for (int i = 0; i < size; i++){
+				if (ct->className[i] == v->cname){
+					error = false;
+					retype = "CLASS";
+					break;
+				}
+			}
+		}
+	}
+
+	if (!error){
+		fvt->variableName.push_back(v->vname);
+		fvt->variableType.push_back(v->cname);
+	}
+	else {
+		if (retype == "CLASS")
+		{
+			serr* err = new serr();
+			err->errortype = VARUNDECLARE;
+			err->errorpos = node->lineno;
+			_name = v->cname;
+			err->errorinfo = "Class '" + _name + "' undefined with " + retype + " '" + _name + "'\n";
+			se->addErrs(err);
+		}
+		else
+		{
+			serr* err = new serr();
+			err->errortype = VARREDEFINED;
+			err->errorpos = node->lineno;
+			err->errorinfo = "Variable '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
+			se->addErrs(err);
+		}
 	}
 	return;
 }
@@ -207,7 +345,7 @@ void SymbolTableAnalyse::FuncAnalyseType(ast* node, VariableTable* fvt, TypeTabl
 	return;
 }
 
-void 
+void
 SymbolTableAnalyse::FuncRead(ast* node, VariableTable* fvt, TypeTable* ftt, int index){
 	if (node->nodetype == 5){
 		FuncAnalyseVariable(node, fvt, ftt, index);
@@ -217,13 +355,18 @@ SymbolTableAnalyse::FuncRead(ast* node, VariableTable* fvt, TypeTable* ftt, int 
 		FuncAnalyseType(node, fvt, ftt, index);
 		return;
 	}
+	if (node->nodetype == 8)
+	{
+		FuncAnalyseClassDec(node, fvt,ftt,index);
+		return;
+	}
 	if (node->nodetype == 'L'){
 		FuncRead(node->l, fvt, ftt, index);
 		FuncRead(node->r, fvt, ftt, index);
 	}
 }
 
-void 
+void
 SymbolTableAnalyse::AnalyseFunction(ast* node){
 	struct fndec* f = (struct fndec*) node;
 	string _name;
@@ -356,8 +499,323 @@ SymbolTableAnalyse::FuncConstant(){
 	ft->functionParaType.push_back(_para_type0);
 	/*.....*/
 }
-
 void 
+SymbolTableAnalyse::ClassAnalyseVariable(ast* node,SymbolTable* cst, VariableTable* cvt)
+{
+	struct var* v = (struct var*) node;
+	string _type, _name;
+	_name = v->name;
+	int size = cst->symbolName.size();
+	bool error = false;
+	string retype;
+	for (int i = 0; i < size; i++){
+		if (cst->symbolName[i] == _name){
+			error = true;
+			retype = cst->symbolType[i];
+			break;
+		}
+	}
+	if (!error){
+		if (v->datatype == 1)
+			_type = "integer";
+		if (v->datatype == 2)
+			_type = "double";
+		if (v->datatype == 0)
+			_type = "char";
+
+		cvt->variableName.push_back(_name);
+		cvt->variableType.push_back(_type);
+		cst->symbolName.push_back(_name);
+		cst->symbolType.push_back(VARIABLE);
+	}
+	else {
+		serr* err = new serr();
+		err->errortype = VARREDEFINED;
+		err->errorpos = node->lineno;
+		err->errorinfo = "Variable '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
+		se->addErrs(err);
+	}
+	return;
+}
+void
+SymbolTableAnalyse::ClassAnalyseClassDec(ast* node, SymbolTable* cst, VariableTable* cvt)
+{
+	struct csdec* v = (struct csdec*)node;
+	string _type, _name, _cname;
+	_name = v->vname;
+	_cname = v->cname;
+	int size = cst->symbolName.size();
+	bool error = false;
+	string retype;
+	for (int i = 0; i < size; i++){
+		if (cst->symbolName[i] == _name){
+			error = true;
+			retype = cst->symbolType[i];
+			break;
+		}
+	}
+	if (error)
+	{
+		serr* err = new serr();
+		err->errortype = VARREDEFINED;
+		err->errorpos = node->lineno;
+		err->errorinfo = "Variable '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
+		se->addErrs(err);
+	}
+	else
+	{
+		error = true;
+		string retype;
+		for (int i = 0; i < size; i++){
+			if (st->symbolName[i] == _cname){
+				error = false;
+				retype = st->symbolType[i];
+				break;
+			}
+		}
+		if (!error)
+		{
+			_type = v->cname;
+			cvt->variableName.push_back(_name);
+			cvt->variableType.push_back(_type);
+			cst->symbolName.push_back(_name);
+			cst->symbolType.push_back(VARIABLE);
+		}
+		else
+		{
+			serr* err = new serr();
+			err->errortype = VARUNDECLARE;
+			err->errorpos = node->lineno;
+			err->errorinfo = "Class '" + _cname + "' undefined with " + retype + " '" + _cname + "'\n";
+			se->addErrs(err);
+		}
+	}
+	return;
+}
+void
+SymbolTableAnalyse::ClassAnalyseType(ast* node, SymbolTable* cst, TypeTable* ctt)
+{
+	struct arr* a = (struct arr*) node;
+	string _name, _info;
+	int _num;
+	_name = a->name;
+	int size = cst->symbolName.size();
+	bool error = false;
+	string retype;
+	for (int i = 0; i < size; i++){
+		if (cst->symbolName[i] == _name){
+			error = true;
+			retype = cst->symbolType[i];
+			break;
+		}
+	}
+	if (!error){
+		if (a->datatype == 1)
+			_info = "integer";
+		if (a->datatype == 2)
+			_info = "double";
+		if (a->datatype == 0)
+			_info = "char";
+
+		_num = a->size;
+		ctt->typeName.push_back(_name);
+		ctt->typeNum.push_back(_num);
+		ctt->typeInfo.push_back(_info);
+		cst->symbolName.push_back(_name);
+		cst->symbolType.push_back(ATYPE);
+	}
+	else {
+		serr* err = new serr();
+		err->errortype = VARREDEFINED;
+		err->errorpos = node->lineno;
+		err->errorinfo = "AType '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
+		se->addErrs(err);
+	}
+	return;
+}
+void 
+SymbolTableAnalyse::ClassAnalyseFunction(ast* node, SymbolTable* cst, FunctionTable* cft)
+{
+	struct fndec* f = (struct fndec*) node;
+	string _name;
+	int _return;
+	int _para_num;
+	vector<string> _para_name;
+	vector<int> _para_size;
+	vector<string> _para_type;
+	VariableTable* fvt = new VariableTable();
+	TypeTable* ftt = new TypeTable();
+	bool _funcstate;
+
+	_name = f->name;
+	_return = f->type;
+	int size = cst->symbolName.size();
+	bool error = false;
+	string retype;
+	for (int i = 0; i < size; i++){
+		if (cst->symbolName[i] == _name){
+			error = true;
+			retype = cst->symbolType[i];
+			break;
+		}
+	}
+
+	if (!error){
+		if (_return == -1){
+			cft->functionReturn.push_back(0);
+		}
+		else if (_return == 0){
+			cft->functionReturn.push_back(2);
+		}
+		else if (_return == 1){
+			cft->functionReturn.push_back(1);
+		}
+		else if (_return == 2){
+			cft->functionReturn.push_back(3);
+		}
+		cft->functionName.push_back(_name);
+		cst->symbolName.push_back(_name);
+		cst->symbolType.push_back(FUNCTION);
+
+		_para_num = 0;
+		symlist* it = f->s;
+		while (it->cur != NULL){
+			_para_name.push_back(it->cur->name);
+			_para_size.push_back(it->cur->size);
+			if (it->cur->datatype == 1)
+				_para_type.push_back("integer");
+			if (it->cur->datatype == 2)
+				_para_type.push_back("double");
+			if (it->cur->datatype == 0)
+				_para_type.push_back("char");
+			_para_num++;
+			it = it->next;
+			if (it == NULL)
+				break;
+		}
+		cft->functionParaNum.push_back(_para_num);
+		cft->functionParaName.push_back(_para_name);
+		cft->functionParaSize.push_back(_para_size);
+		cft->functionParaType.push_back(_para_type);
+
+		int index = cft->functionParaName.size() - 1;
+
+		ast*  cur = f->tl;
+		FuncRead(cur, fvt, ftt, index);
+		cft->functionVariable.push_back(fvt);
+		cft->functionType.push_back(ftt);
+	}
+	else{
+		serr* err = new serr();
+		err->errortype = VARREDEFINED;
+		err->errorpos = node->lineno;
+		err->errorinfo = "Function '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
+		se->addErrs(err);
+	}
+	return;
+}
+void
+SymbolTableAnalyse::ClassRead(ast* node,SymbolTable* cst, VariableTable* cvt, TypeTable* ctt, FunctionTable* cft)
+{
+	if (node->nodetype == 5){
+		ClassAnalyseVariable(node,cst, cvt);
+		return;
+	}
+	if (node->nodetype == 6){
+		ClassAnalyseType(node, cst,ctt);
+		return;
+	}
+	if (node->nodetype == 7)
+	{
+		ClassAnalyseFunction(node, cst,cft);
+	}
+	if (node->nodetype == 8)
+	{
+		ClassAnalyseClassDec(node, cst,cvt);
+		return;
+	}
+	if (node->nodetype == 'L'){
+		ClassRead(node->l, cst,cvt, ctt, cft);
+		ClassRead(node->r, cst,cvt, ctt, cft);
+	}
+}
+void 
+SymbolTableAnalyse::AnalyseClassDef(ast* node)
+{
+	struct csdef* c = (struct csdef*)node;
+
+	bool error = false;
+	string retype;
+	for (int i = 0; i < ct->className.size(); i++)
+	{
+		if (ct->className[i] == c->cname)
+		{
+			error = true;
+			retype = "CLASS";
+			break;
+		}
+	}
+	if (!error)
+	{
+		if (c->fname !=NULL )
+		{
+			error = true;
+			for (int i = 0; i < ct->className.size(); i++)
+			{
+				if (ct->className[i] == c->fname)
+				{
+					error = false;
+					retype = "FATHER CLASS";
+					break;
+				}
+			}
+		}
+	}
+	if (!error)
+	{
+		ct->className.push_back(c->cname);
+		if (c->fname == NULL)
+			ct->fatherName.push_back("");
+		else
+			ct->fatherName.push_back(c->fname);
+		st->symbolName.push_back(c->cname);
+		st->symbolType.push_back(CLASSDEF);
+
+		VariableTable* cvt = new VariableTable();
+		TypeTable* ctt = new TypeTable();
+		FunctionTable* cft = new FunctionTable();
+		SymbolTable* cst = new SymbolTable();
+
+		ClassRead(c->tl, cst,cvt, ctt, cft);
+		ct->classVariable.push_back(cvt);
+		ct->classType.push_back(ctt);
+		ct->classFunction.push_back(cft);
+		ct->classSymbol.push_back(cst);
+	}
+	else
+	{
+		if (retype == "CLASS")
+		{
+			serr* err = new serr();
+			err->errortype = VARREDEFINED;
+			err->errorpos = node->lineno;
+			string _name = c->cname;
+			err->errorinfo = "Class '" + _name + "' redefined with " + retype + " '" + _name + "'\n";
+			se->addErrs(err);
+		}
+		else
+		{
+			serr* err = new serr();
+			err->errortype = VARUNDECLARE;
+			err->errorpos = node->lineno;
+			string _name = c->fname;
+			err->errorinfo = "Father Class '" + _name + "' undefined with " + retype + " '" + _name + "'\n";
+			se->addErrs(err);
+		}
+	}
+	return;
+}
+void
 SymbolTableAnalyse::_Analyse(ast* node){
 	if (node == NULL)
 		return;
@@ -381,6 +839,16 @@ SymbolTableAnalyse::_Analyse(ast* node){
 		AnalyseFunction(node);
 		return;
 	}
+	case 8:
+	{
+		AnalyseClassDec(node);
+		return;
+	}
+	case 9:
+	{
+		AnalyseClassDef(node);
+		return;
+	}
 	case 'L':
 	{
 		_Analyse(node->l);
@@ -390,7 +858,7 @@ SymbolTableAnalyse::_Analyse(ast* node){
 	}
 }
 
-void 
+void
 SymbolTableAnalyse::Analyse(ast* root){
 	_Analyse(root);
 	FuncConstant();
@@ -402,6 +870,8 @@ SymbolTableAnalyse::SymbolTableAnalyse(SemanticError* semerr){
 	tt = new TypeTable();
 	vt = new VariableTable();
 	ft = new FunctionTable();
+	ct = new ClassTable();
+
 }
 
 para*
@@ -504,3 +974,145 @@ SymbolTableAnalyse::getFuncPara(int funcindex, int paraindex){
 	p->type = ft->functionParaType[funcindex][paraindex];
 	return p;
 }
+
+
+// These codes were added by Chen Jianan
+//---------------------------------find-------------------------------
+int SymbolTableAnalyse::findType(string name)
+{
+	int ret = 0;
+	int size = tt->typeName.size();
+	for (ret = 0; ret < size; ret++)
+	{
+		// found
+		if (tt->typeName[ret] == name)
+			break;
+	}
+	if (ret == size)
+		return -1;
+	else
+		return ret;
+}
+int SymbolTableAnalyse::findVariable(string name)
+{
+	int ret = 0;
+	int size = vt->variableName.size();
+	for (ret = 0; ret < size; ret++)
+	{
+		//found
+		if (vt->variableName[ret] == name)
+			break;
+	}
+	if (ret == size)
+		return -1;
+	else
+		return ret;
+}
+int SymbolTableAnalyse::findClass(string name)
+{
+	int ret = 0;
+	int size = ct->className.size();
+	for (ret = 0; ret < size; ret++)
+	{
+		//found
+		if (ct->className[ret] == name)
+			break;
+	}
+	if (ret == size)
+		return -1;
+	else
+		return ret;
+}
+
+int SymbolTableAnalyse::findVariableAndTypeInClass(const string& vname, string& className)
+{
+	// 首先寻找类名所对应的的类的
+	int classIndex = 0;
+	int size = 0;
+	int i, j;
+
+	// 先找类索引
+	classIndex = findClass(className);
+
+	// 找不到该类名，直接返回-1
+	if (classIndex == -1)
+		return -1;
+
+	// 找到类索引，按照索引得到local的变量表和数组表
+	VariableTable* cvt = ct->classVariable[classIndex];
+	TypeTable* ctt = ct->classType[classIndex];
+	if (cvt)
+	{
+		// 先寻找变量表
+		size = cvt->variableName.size();
+		for (i = 0; i < size; i++)
+		{
+			if (cvt->variableName[i] == vname)
+				break;
+		}
+		if (i != size)
+			return i;
+	}
+
+	if (ctt)
+	{
+		// 再找数组表
+		size = ctt->typeName.size();
+		for (j = 0; j < size; j++)
+		{
+			if (ctt->typeName[j] == vname)
+				break;
+		}
+		if (j != size)
+			return i + j;
+	}
+
+	// 找不到，往父亲寻找
+	if (ct->fatherName[classIndex] != "")
+	{
+		className = ct->fatherName[classIndex];
+		return findVariableAndTypeInClass(vname, className);
+	}
+
+	// 全部找遍都找不到
+	className = "";
+	return -1;
+}
+
+string SymbolTableAnalyse::getVariableType(string vname)
+{
+	string ret = "";
+	if (vt == NULL)
+		return ret;
+	int size = vt->variableName.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (vname == vt->variableName[i])
+			ret = vt->variableType[i];
+	}
+	return ret;
+}
+
+//---------------------------------get global tables---------------------------------
+SymbolTable*	SymbolTableAnalyse::getSymbolTable()
+{
+	return this->st;
+}
+TypeTable*		SymbolTableAnalyse::getTypeTable()
+{
+	return this->tt;
+}
+VariableTable*	SymbolTableAnalyse::getVariableTable()
+{
+	return this->vt;
+}
+FunctionTable*	SymbolTableAnalyse::getFunctionTable()
+{
+	return this->ft;
+}
+ClassTable*		SymbolTableAnalyse::getClassTable()
+{
+	return this->ct;
+}
+
+// End

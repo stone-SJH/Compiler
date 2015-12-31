@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -534,7 +535,7 @@ struct un eval(struct pcdata*pp, struct ast* a)
 		case '=':
 		{
 			struct symasgn* asgn = (struct symasgn*)a;
-			struct symbol* s = lookup(pp, asgn->name);
+			//struct symbol* s = lookup(pp, asgn->name);
 			/*if (s == NULL)
 			{
 				yyerror(pp, "%s variable undefined", asgn->name);
@@ -542,7 +543,7 @@ struct un eval(struct pcdata*pp, struct ast* a)
 			}
 			r1.type = s->datatype;*/
 			struct un tmp = eval(pp, asgn->v);
-			if (tmp.type != r1.type)
+			/*if (tmp.type != r1.type)
 			{
 				yyerror(pp, "%s type is wrong", asgn->v);
 				exit(0);
@@ -576,7 +577,7 @@ struct un eval(struct pcdata*pp, struct ast* a)
 				yyerror(pp, "%s cannot be left", asgn->name);
 				exit(0);
 				break;
-			}
+			}*/
 			return r1;
 		}
 		case '1':

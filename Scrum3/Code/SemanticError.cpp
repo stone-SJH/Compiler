@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SemanticError.h"
 
 SemanticError::SemanticError(){
@@ -11,7 +12,7 @@ SemanticError::addErrs(serr* err){
 	return;
 }
 
-bool 
+bool
 SemanticError::checkErrs(){
 	if (errnos != 0)
 		return true;
@@ -31,11 +32,11 @@ string
 SemanticError::showErrs(){
 	int size = errlist.size();
 	string sr;
-	sr = ""; 
+	sr = "";
 	for (int i = 0; i < size; i++){
 		string et;
 		switch (errlist[i]->errortype)
-		{ 
+		{
 		case TYPEMISMATCH:
 			et = "TYPE MISMATCH";
 			break;

@@ -1,5 +1,5 @@
-#ifndef _TABLETYPE_
-#define _TABLETYPE_
+#ifndef TABLETYPE
+#define TABLETYPE
 
 #include <iostream>
 #include <vector>
@@ -8,9 +8,9 @@ using namespace std;
 enum stype{//symbol type
 	FUNCTION,
 	ATYPE,
-	VARIABLE
+	VARIABLE,
+	CLASSDEF
 };
-
 struct para{
 	string name;
 	string type;
@@ -29,7 +29,7 @@ public:
 	vector<string> symbolName;
 	vector<stype> symbolType;
 };
-//for class & array
+//for array
 class TypeTable{
 public:
 	vector<string> typeName;
@@ -53,5 +53,16 @@ public:
 	vector<VariableTable*> functionVariable;
 	vector<TypeTable*> functionType;
 	vector<bool> functionState;
+};
+
+//for class 类的定义
+class ClassTable{
+public:
+	vector<string>className;
+	vector<string>fatherName;
+	vector<SymbolTable*>classSymbol;
+	vector<VariableTable*>classVariable;
+	vector<TypeTable*>classType;
+	vector<FunctionTable*>classFunction;
 };
 #endif

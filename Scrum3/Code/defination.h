@@ -1,10 +1,15 @@
 #ifndef __DEFINATION_H__
 #define __DEFINATION_H__
 //----------------------------------------------------
+#include <string>
+using namespace std;
+
+
 struct pcdata{
 	void* scaninfo;
 	struct symbol** symtab;
 	struct ast* ast;
+	string tokens;
 };
 struct symbol{
 	char* name;
@@ -168,6 +173,11 @@ struct symref :public ast{
 //图形化的工具
 struct singlestring :public ast{
 	char* str;
+};
+struct twostrings : public ast
+{
+	char* str1;
+	char* str2;
 };
 
 struct ast* newfunc(struct pcdata*, int functype, struct ast* l);

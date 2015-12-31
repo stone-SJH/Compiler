@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #line 2 "lexer.cpp"
 
 #line 4 "lexer.cpp"
@@ -13,6 +14,10 @@
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
+
+/////////////////////////////////////////////////////////////////////////
+void yyerror(struct pcdata* pp, char* s, ...);
+/////////////////////////////////////////////////////////////////////////
 
 /* First, we deal with  platform-specific or compiler-specific issues. */
 
@@ -937,227 +942,227 @@ case 15:
 case 16:
 YY_RULE_SETUP
 #line 38 "lexer.l"
-{	return yytext[0];	}
+{pp->tokens+=yytext[0]; return yytext[0];	}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 40 "lexer.l"
-{ yylval->fn=1; return CMP; }
+{pp->tokens+=yytext; yylval->fn=1; return CMP; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 41 "lexer.l"
-{ yylval->fn=2; return CMP; }
+{ pp->tokens+=yytext;yylval->fn=2; return CMP; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 42 "lexer.l"
-{ yylval->fn=3; return CMP; }
+{ pp->tokens+=yytext;yylval->fn=3; return CMP; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 43 "lexer.l"
-{ yylval->fn=4; return CMP; }
+{pp->tokens+=yytext; yylval->fn=4; return CMP; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 44 "lexer.l"
-{ yylval->fn=5; return CMP; }
+{ pp->tokens+=yytext;yylval->fn=5; return CMP; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 45 "lexer.l"
-{ yylval->fn=6; return CMP; }
+{pp->tokens+=yytext; yylval->fn=6; return CMP; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 46 "lexer.l"
-{ return GET; }
+{ pp->tokens+=yytext;return GET; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 48 "lexer.l"
-{ return IF; }
+{ pp->tokens+=yytext;return IF; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 49 "lexer.l"
-{ return THEN; }
+{ pp->tokens+=yytext;return THEN; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 50 "lexer.l"
-{ return ELSE; }
+{ pp->tokens+=yytext;return ELSE; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 51 "lexer.l"
-{ return ENDIF;}
+{pp->tokens+=yytext; return ENDIF;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 52 "lexer.l"
-{ return WHILE; }
+{pp->tokens+=yytext; return WHILE; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 53 "lexer.l"
-{ return ENDWHILE; }
+{pp->tokens+=yytext; return ENDWHILE; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 54 "lexer.l"
-{ return FOR; }
+{ pp->tokens+=yytext;return FOR; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 55 "lexer.l"
-{ return FROM; }
+{ pp->tokens+=yytext;return FROM; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 56 "lexer.l"
-{ return TO; }
+{ pp->tokens+=yytext;return TO; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 57 "lexer.l"
-{ return STEP; }
+{pp->tokens+=yytext; return STEP; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 58 "lexer.l"
-{ return ENDFOR; }
+{ pp->tokens+=yytext;return ENDFOR; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 59 "lexer.l"
-{ return FOREACH; }
+{ pp->tokens+=yytext;return FOREACH; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 60 "lexer.l"
-{ return YYIN;}
+{ pp->tokens+=yytext;return YYIN;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 61 "lexer.l"
-{ return ENDFOREACH; }
+{ pp->tokens+=yytext;return ENDFOREACH; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 62 "lexer.l"
-{ return LET; }
+{ pp->tokens+=yytext;return LET; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 63 "lexer.l"
-{ return DEFINE;}
+{ pp->tokens+=yytext;return DEFINE;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 64 "lexer.l"
-{ return ENDFUNC; }
+{pp->tokens+=yytext; return ENDFUNC; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 65 "lexer.l"
-{ return RETURN; }
+{ pp->tokens+=yytext;return RETURN; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 66 "lexer.l"
-{ return CLASS;}
+{ pp->tokens+=yytext;return CLASS;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 67 "lexer.l"
-{ return EXTENDS;}
+{pp->tokens+=yytext; return EXTENDS;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 68 "lexer.l"
-{ return ENDCLASS;}
+{ pp->tokens+=yytext;return ENDCLASS;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 70 "lexer.l"
-{ return VAR;}
+{ pp->tokens+=yytext;return VAR;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 71 "lexer.l"
-{ return AS;}
+{ pp->tokens+=yytext;return AS;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 72 "lexer.l"
-{ return OF;}
+{ pp->tokens+=yytext;return OF;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 73 "lexer.l"
-{ yylval->type=0; return TYPE;  }
+{ pp->tokens+=yytext;yylval->type=0; return TYPE;  }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 74 "lexer.l"
-{ yylval->type = 1; return TYPE; }
+{ pp->tokens+=yytext;yylval->type = 1; return TYPE; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 75 "lexer.l"
-{ yylval->type = 2; return TYPE; }
+{pp->tokens+=yytext; yylval->type = 2; return TYPE; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 76 "lexer.l"
-{ yylval->type = -1; return TYPE; }
+{ pp->tokens+=yytext;yylval->type = -1; return TYPE; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
 #line 77 "lexer.l"
-{ return ARRAY; }
+{ pp->tokens+=yytext;return ARRAY; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 79 "lexer.l"
-{ yylval->fn=B_sqrt; return FUNC; }
+{ pp->tokens+=yytext;yylval->fn=B_sqrt; return FUNC; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 80 "lexer.l"
-{ yylval->fn=B_exp; return FUNC; }
+{pp->tokens+=yytext; yylval->fn=B_exp; return FUNC; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 81 "lexer.l"
-{ yylval->fn=B_log; return FUNC; }
+{pp->tokens+=yytext; yylval->fn=B_log; return FUNC; }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 82 "lexer.l"
-{ yylval->fn=B_print; return FUNC; }
+{ pp->tokens+=yytext;yylval->fn=B_print; return FUNC; }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 84 "lexer.l"
-{ yylval->c=yytext[1]; return TYPECHAR; }
+{ pp->tokens+=yytext;yylval->c=yytext[1]; return TYPECHAR; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 85 "lexer.l"
-{ yylval->i=atoi(yytext);return TYPEINT; }
+{pp->tokens+=yytext; yylval->i=atoi(yytext);return TYPEINT; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
 #line 86 "lexer.l"
-{ yylval->d=atof(yytext); return TYPEDOUBLE; }
+{ pp->tokens+=yytext;yylval->d=atof(yytext); return TYPEDOUBLE; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
 #line 88 "lexer.l"
-{ char* t=new char[strlen(yytext)+1];
+{pp->tokens+=yytext; char* t=new char[strlen(yytext)+1];
 									strcpy_s(t,strlen(yytext)+1,yytext) ;
 									yylval->name=t;
 									return NAME; }
@@ -1181,7 +1186,7 @@ case 64:
 /* rule 64 can match eol */
 YY_RULE_SETUP
 #line 96 "lexer.l"
-
+{pp->tokens+=yytext;}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP

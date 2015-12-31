@@ -137,22 +137,25 @@ void read(ast* node){
 
 int main()
 {
-	struct pcdata p = {
-		NULL,
-		NULL,
-		NULL
-	};
-	static symbol* symtab[MAX];
-	if (yylex_init_extra(&p, &p.scaninfo)){
-		perror("init failed\n");
-		return 0;
-	}
-	p.symtab = symtab;
+	for (;;)
+	{
+		struct pcdata p = {
+			NULL,
+			NULL,
+			NULL,
+			""
+		};
+		static symbol* symtab[MAX];
+		if (yylex_init_extra(&p, &p.scaninfo)){
+			perror("init failed\n");
+			return 0;
+		}
+		p.symtab = symtab;
 
-	for (int i = 0; i < MAX; i++)
-		p.symtab[i] = NULL;
-	string filename;
-	for (;;){
+		for (int i = 0; i < MAX; i++)
+			p.symtab[i] = NULL;
+		string filename;
+
 		cout << "input the filename>";
 		cin >> filename;
 		FILE* f;
@@ -160,27 +163,18 @@ int main()
 		yyset_in(f, p.scaninfo);
 		yyparse(&p);
 		ast* root = p.ast;
-		//SymbolTableAnalyse* sta = new SymbolTableAnalyse();
-		//sta->Analyse(root);
+		cout << p.tokens << endl;
+		//eval(&p, root);
+		SemanticError se;
+		SymbolTableAnalyse* sta = new SymbolTableAnalyse(&se);
+		sta->Analyse(root);
 
-		/*if (p.ast){
-		eval(&p, p.ast);
-		//treefree(&p, p.ast);
-		p.ast = NULL;
-		}*/
-		/*if (root != NULL){
-		cout << root->nodetype << endl;
-		read(root);
-		//cout << root->l->nodetype << endl;
-		//read(root->r);
-		}
-		cout << "done" << endl;*/
 		IRGeneration* irg = new IRGeneration(root);
 		string ir = irg->Generate();
 		char dstName[100];
 		memset(dstName, 0, 100);
 		int pos = filename.find(".");
-		sprintf_s(dstName, "%s.ll", filename.substr(0,pos).c_str());
+		sprintf_s(dstName, "%s.ll", filename.substr(0, pos).c_str());
 		ofstream ofs(dstName);
 		ofs << ir << endl;
 		cout << ir << endl;
