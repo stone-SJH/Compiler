@@ -1818,6 +1818,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							ir += ir1;
 							return INT_MAX;
 						}
+						else{
+							serr* err = new serr();
+							err->errortype = TYPEMISMATCH;
+							err->errorpos = sr->lineno;
+							err->errorinfo = "Only an integer can be an index.\n";
+							se->addErrs(err);
+							return INT_MAX;
+						}
 					}
 					else{
 						int curindex0 = index0;
@@ -1835,8 +1843,11 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							return INT_MAX;
 						}
 						else if (p->type == "char"){
-							ir1 += getLoadCharPointer(varname);
-							//[TODO]
+							serr* err = new serr();
+							err->errortype = TYPEMISMATCH;
+							err->errorpos = sr->lineno;
+							err->errorinfo = "Variable '" + varname + "' can not be an index.\n";
+							se->addErrs(err);
 							return INT_MAX;
 						}
 					}
@@ -1855,7 +1866,7 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 				if (p->name != ""){
 					string ir1;
 					int r = INT_MAX;
-					char c;
+					char c = 0;
 					double d;
 					r = getCodeAss(indexnode, index0, ir1, c, d);
 					if (r != INT_MAX){
@@ -1867,6 +1878,14 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							ir1 += getLoadInt(getInt(index - 1));
 							index0 = index - 1;
 							ir += ir1;
+							return INT_MAX;
+						}
+						else{
+							serr* err = new serr();
+							err->errortype = TYPEMISMATCH;
+							err->errorpos = sr->lineno;
+							err->errorinfo = "Only an integer can be an index.\n";
+							se->addErrs(err);
 							return INT_MAX;
 						}
 					}
@@ -1886,8 +1905,11 @@ IRGeneration::getCodeAss(ast* node, int& index0, string& ir, char& ch, double& d
 							return INT_MAX;
 						}
 						else if (p->type == "char"){
-							ir1 += getLoadCharPointer(varname);
-							//[TODO]
+							serr* err = new serr();
+							err->errortype = TYPEMISMATCH;
+							err->errorpos = sr->lineno;
+							err->errorinfo = "Variable '" + varname + "' can not be an index.\n";
+							se->addErrs(err);
 							return INT_MAX;
 						}
 					}
